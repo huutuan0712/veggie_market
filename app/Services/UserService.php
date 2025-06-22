@@ -31,11 +31,13 @@ class UserService extends BaseService
         $attributes = $dto->toArray();
 
         $user = $this->create($attributes);
+        $user->assignRole('user');
+        $user->sendEmailVerificationNotification();
 
         return UserDTO::fromModel($user);
     }
 
-    public function update(int $id, array $attributes): User
+    public function update(string|int $id, array $attributes): User
     {
        return parent::update($id, $attributes);
     }
