@@ -2,53 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\Product\Product as ProductDTO;
+use App\Http\Requests\Product\StoreProductFormRequest;
+use App\Http\Requests\Product\UpdateProductFormRequest;
+use App\Services\CategoryService;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    protected $productService;
+
+    protected $categoryService;
+
+    public function __construct(ProductService $productService, CategoryService $categoryService)
+    {
+        $this->productService = $productService;
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $products = collect([
-            (object)[
-                'id' => 1,
-                'name' => 'Xoài Hòa Lộc',
-                'category' => 'Xoài',
-                'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'description' => 'Xoài ngọt thơm tự nhiên, được trồng tại Tiền Giang.',
-                'price' => 50000,
-                'originalPrice' => 60000,
-                'inStock' => true,
-            ],
-            (object)[
-                'id' => 2,
-                'name' => 'Dâu tây Đà Lạt',
-                'category' => 'Dâu',
-                'image' => 'https://images.pexels.com/photos/1125328/pexels-photo-1125328.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'description' => 'Dâu tây tươi, sạch, giàu vitamin C.',
-                'price' => 80000,
-                'originalPrice' => null,
-                'inStock' => false,
-            ],
-            // Add more fake products here
-        ]);
+        $params = [
+            'search' => $request->get('search'),
+            'page' => $request->get('page', 1),
+            'per_page' => 12,
+            'sort_by' => 'name',
+            'sort_direction' => 'asc',
+        ];
 
-        $categories = ['Tất cả', 'Xoài', 'Dâu', 'Cam', 'Chuối'];
+        $selectedCategory = 'Tất cả';
 
-        $searchTerm = $request->get('search');
-        $selectedCategory = $request->get('category');
+        if ($request->filled('category') && $request->get('category') !== 'Tất cả') {
+            $params['category'] = $request->get('category');
+            $selectedCategory = $params['category'];
+        }
 
-        $filtered = $products->filter(function ($product) use ($searchTerm, $selectedCategory) {
-            return (!$searchTerm || str_contains(strtolower($product->name), strtolower($searchTerm)))
-                && ($selectedCategory === 'Tất cả' || !$selectedCategory || $product->category === $selectedCategory);
-        });
+        $products = $this->productService->getPaginatedList($params);
+        $categories = $this->categoryService->getAll();
 
         return view('pages.product.index', [
-            'products' => $filtered,
+            'products' => $products,
             'categories' => $categories,
-            'searchTerm' => $searchTerm,
             'selectedCategory' => $selectedCategory
         ]);
     }
@@ -58,15 +56,18 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.product.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductFormRequest $request)
     {
-        //
+        $dto = ProductDTO::fromRequest($request->validated());
+        $this->productService->createDTO($dto);
+
+        return redirect()->route('admin.product.index')->with('success', 'Tạo sản phẩm thành công!');
     }
 
     /**
@@ -74,23 +75,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = [
-            'id' => $id,
-            'name' => 'Xoài Hòa Lộc',
-            'category' => 'Trái cây nhiệt đới',
-            'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'price' => 50000,
-            'originalPrice' => 65000,
-            'description' => 'Xoài Hòa Lộc là loại xoài nổi tiếng với vị ngọt thanh, thơm dịu và ít xơ.',
-            'origin' => 'Tiền Giang, Việt Nam',
-            'inStock' => true,
-            'benefits' => [
-                'Tốt cho hệ tiêu hóa',
-                'Giàu vitamin C',
-                'Tăng cường miễn dịch',
-                'Làm đẹp da',
-            ],
-        ];
+        $product = $this->productService->getProductWithRelations($id);
 
         return view('pages.product.show', compact('product'));
     }
@@ -100,15 +85,20 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $product = $this->productService->getProductWithRelations($id);
+
+        return view('admin.product.edit', compact('product'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProductFormRequest $request, string $id)
     {
-        //
+        $dto = ProductDTO::fromRequest($request->validated());
+        $this->productService->updateDTO($id, $dto);
+
+        return redirect()->route('admin.product.index')->with('success', 'Cật nhật sản phẩm thành công!');
     }
 
     /**
@@ -116,6 +106,7 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->productService->delete($id);
+        return redirect()->route('admin.product.index')->with('success', 'Xóa sản phẩm thành công!');
     }
 }

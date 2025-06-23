@@ -13,7 +13,11 @@ class Product extends Model
     protected $table = 'products';
     protected $fillable = ['name', 'slug', 'description', 'category_id', 'price', 'stock', 'status', 'unit'];
 
-    public function productImages()
+    protected $casts = [
+        'status' => \App\Enums\ProductStatus::class,
+    ];
+
+    public function images()
     {
         return $this->hasMany(ProductImages::class, 'product_id');
     }

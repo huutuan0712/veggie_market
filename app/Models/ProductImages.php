@@ -10,5 +10,5 @@ class ProductImages extends Model
     use SoftDeletes;
 
     protected $table = 'product_images';
-    protected $fillable = ['product_id', 'image'];
+    protected $fillable = ['product_id', 'path'];
 }
