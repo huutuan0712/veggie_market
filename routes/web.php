@@ -17,21 +17,22 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name
 Route::get('/reset-password/{token}', [AuthController::class, 'showRestPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.submitRest');
 
-//Verify Email
-    Route::get('/email/verify', function () {
-        return view('mail.verify-email');
-    })->middleware('auth')->name('verification.notice');
-
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-        return redirect('/');
-    })->middleware(['auth', 'signed'])->name('verification.verify');
-
-    Route::post('/email/verification-notification', function (Request $request) {
-        $request->user()->sendEmailVerificationNotification();
-        return back()->with('status', 'Link xác minh đã được gửi lại!');
-    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 });
+
+//Verify Email
+Route::get('/email/verify', function () {
+    return view('mail.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('status', 'Link xác minh đã được gửi lại!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

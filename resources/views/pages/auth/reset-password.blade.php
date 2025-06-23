@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
-    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50">
-        <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50 flex items-center justify-center">
+        <div class="max-w-full md:min-w-lg mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-2xl p-8">
 
                 {{-- Header --}}
@@ -35,7 +35,7 @@
                 @endif
 
                 {{-- Form --}}
-                <form method="POST" action="{{ route('password.submitRest') }}" class="space-y-6" x-data="{ showPassword: false, showConfirmPassword: false }">
+                <form method="POST" action="{{ route('password.submitRest') }}" class="space-y-6" >
                     @csrf
                     <input type="hidden" name="token" value="{{ $token }}">
                     <input type="hidden" name="email" value="{{ $email }}">
@@ -46,6 +46,7 @@
                             Mật khẩu mới
                         </label>
                         <div class="relative">
+                            <x-heroicon-o-lock-closed class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             <input
                                 type="password"
                                 name="password"
@@ -54,6 +55,9 @@
                                 placeholder="Nhập mật khẩu mới"
                             />
                         </div>
+                        @error('password')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Xác nhận mật khẩu --}}
@@ -62,6 +66,7 @@
                             Xác nhận mật khẩu mới
                         </label>
                         <div class="relative">
+                            <x-heroicon-o-lock-closed class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             <input
                                 type="password"
                                 name="password_confirmation"
@@ -70,6 +75,9 @@
                                 placeholder="Nhập lại mật khẩu mới"
                             />
                         </div>
+                        @error('password_confirmation')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Submit --}}

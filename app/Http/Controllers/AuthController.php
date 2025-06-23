@@ -66,7 +66,7 @@ class AuthController extends Controller
     {
         try {
             $dto = UserDTO::fromRequest($request->validated());
-            $user = $this->userService->create($dto);
+            $user = $this->userService->createDTO($dto);
 
             Auth::login($user);
 

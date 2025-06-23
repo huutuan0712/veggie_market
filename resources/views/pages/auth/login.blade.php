@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
-    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50">
-        <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50 flex items-center justify-center">
+        <div class="max-w-full md:min-w-lg mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-2xl p-8">
                 {{-- Logo --}}
                 <div class="text-center mb-8">
@@ -45,7 +45,7 @@
                             />
                         </div>
                         @error('email')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -65,12 +65,23 @@
                             />
                         </div>
                         @error('password')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     {{-- Forgot Password --}}
-                    <div class="text-right">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="remember-me"
+                                class="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                name="remember"
+                            />
+                            <label for="remember-me" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                                Ghi nhớ đăng nhập
+                            </label>
+                        </div>
                         <a href="{{ route('password.request') }}" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
                             Quên mật khẩu?
                         </a>

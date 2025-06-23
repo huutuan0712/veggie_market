@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
-    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50">
-        <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50 flex items-center justify-center">
+        <div class="max-w-full md:min-w-lg mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-2xl p-8">
 
                 {{-- Logo --}}
@@ -19,17 +19,6 @@
                     <p class="text-gray-600 mt-2">Tạo tài khoản mới</p>
                 </div>
 
-                {{-- Error Message --}}
-                @if ($errors->any())
-                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6">
-                        <ul class="list-disc pl-5 text-sm">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
                 <form method="POST" action="{{ route('register') }}" class="space-y-6">
                     @csrf
                     {{-- Name --}}
@@ -39,13 +28,16 @@
                             <x-heroicon-o-user class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             <input
                                 type="text"
-                                name="name"
-                                value="{{ old('name') }}"
+                                name="username"
+                                value="{{ old('username') }}"
                                 required
                                 class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 placeholder="Nhập họ và tên"
                             />
                         </div>
+                        @error('username')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Email --}}
@@ -62,10 +54,13 @@
                                 placeholder="Nhập email của bạn"
                             />
                         </div>
+                        @error('email')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Password --}}
-                    <div x-data="{ show: false }">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
                         <div class="relative">
                             <x-heroicon-o-lock-closed class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -77,10 +72,13 @@
                                 placeholder="Nhập mật khẩu"
                             />
                         </div>
+                        @error('password')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Confirm Password --}}
-                    <div x-data="{ show: false }">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
                         <div class="relative">
                             <x-heroicon-o-lock-closed class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -92,6 +90,9 @@
                                 placeholder="Nhập lại mật khẩu"
                             />
                         </div>
+                        @error('password_confirmation')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Submit --}}

@@ -28,7 +28,7 @@ class User {
     public ?string $deleted_at = null;
 
 
-    public function fromModel (\App\Models\User $user):self
+    public static function fromModel (\App\Models\User $user):self
     {
         $dto = new self;
         $dto->username = $user->username;
@@ -46,7 +46,7 @@ class User {
     }
 
 
-    public function fromRequest (array $data): self
+    public static function fromRequest (array $data): self
     {
         $dto = new self;
         $dto->username = $data['username'] ?? null;

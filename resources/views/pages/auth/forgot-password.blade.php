@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
-    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50">
+    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50 flex items-center justify-center">
         <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-2xl p-8">
 
@@ -26,14 +26,6 @@
                     </div>
                 @endif
 
-                @if ($errors->any())
-                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6">
-                        @foreach ($errors->all() as $error)
-                            <p class="text-sm">{{ $error }}</p>
-                        @endforeach
-                    </div>
-                @endif
-
                 {{-- Form --}}
                 <form method="POST" action="{{ route('password.request') }}" class="space-y-6">
                     @csrf
@@ -52,6 +44,9 @@
                                 placeholder="Nhập email của bạn"
                             />
                         </div>
+                        @error('email')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Submit --}}
