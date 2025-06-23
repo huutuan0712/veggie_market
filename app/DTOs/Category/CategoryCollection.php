@@ -1,32 +1,34 @@
 <?php
 
-namespace App\DTOs\User;
+namespace App\DTOs\Category;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class UserCollection
+class CategoryCollection
 {
     public array $data = [];
 
     public ?array $meta = null;
 
-    public static function fromCollection (array $users)
+
+    public static function fromCollection (array $categories)
     {
         $data = [];
 
-        foreach ($users as $user) {
-            $data = User::fromModel($user);
+        foreach ($categories as $category)
+        {
+            $data[] = Category::fromModel($category);
         }
 
         $collection = new self;
         $collection->data = $data;
-
         return $collection;
     }
 
-    public static function fromPaginator(LengthAwarePaginator $paginator): self
+    public static function fromPaginator (LengthAwarePaginator $paginator): self
     {
         $collection = self::fromCollection($paginator->items());
+
         $collection->meta = [
             'current_page' => $paginator->currentPage(),
             'from' => $paginator->firstItem(),
@@ -36,7 +38,6 @@ class UserCollection
             'per_page' => $paginator->perPage(),
             'total' => $paginator->total(),
         ];
-
         return $collection;
     }
 

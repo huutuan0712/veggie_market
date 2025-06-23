@@ -57,7 +57,7 @@ class UserService extends BaseService
          $perPage = $params['per_page'] ?? 15;
          $perPage = min($perPage, 100); // Maximum 100 items per page
          $search = $params['search'] ?? null;
-         $sortBy = $params['sort_by'] ?? 'name';
+         $sortBy = $params['sort_by'] ?? 'username';
          $sortDirection = $params['sort_direction'] ?? 'asc';
          $includeDeleted = $params['include_deleted'] ?? false;
 
@@ -81,9 +81,9 @@ class UserService extends BaseService
          $query->orderBy($sortBy, $sortDirection);
 
          // Get paginated results
-         $authors = $query->paginate($perPage, ['*'], 'page', $page);
+         $users = $query->paginate($perPage, ['*'], 'page', $page);
 
-         return UserCollection::fromPaginator($authors);
+         return UserCollection::fromPaginator($users);
      }
 
 
@@ -114,7 +114,7 @@ class UserService extends BaseService
      {
          try {
             $user = $this->model->withTrashed()->findOfFail($id);
-             $result = $user->forceDelete();
+            $result = $user->forceDelete();
 
             return $result;
 
