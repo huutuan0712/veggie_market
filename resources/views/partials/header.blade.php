@@ -40,18 +40,36 @@
 
                 {{-- User --}}
                 @auth
-                    <div class="flex items-center space-x-2">
-                        <span class="hidden sm:block text-sm text-gray-700">
-                            {{ Auth::user()->name }}
-                        </span>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button
-                                class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-300 text-sm font-medium"
-                            >
-                                Đăng xuất
-                            </button>
-                        </form>
+                    <div class="relative">
+                        <button
+                            id="userDropdownToggle"
+                            class="flex items-center space-x-2 bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm font-medium text-gray-700"
+                        >
+                            <span class="hidden sm:block">{{ Auth::user()->username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div
+                            id="userDropdownMenu"
+                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"
+                        >
+                            <a href="{{ route('account', ['tab' => 'profile'])}}"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                Hồ sơ
+                            </a>
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button
+                                    type="submit"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-lg"
+                                >
+                                    Đăng xuất
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition-colors">
@@ -65,8 +83,12 @@
                     id="mobileMenuToggle"
                     class="md:hidden p-2 text-gray-700 hover:text-orange-600 transition-colors"
                 >
-{{--                    <x-heroicon-o-menu id="menuIcon" class="h-6 w-6 block" />--}}
-{{--                    <x-heroicon-o-x id="closeIcon" class="h-6 w-6 hidden" />--}}
+                    <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
         </div>
@@ -102,4 +124,22 @@
         menuIcon.classList.toggle('hidden');
         closeIcon.classList.toggle('hidden');
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('userDropdownToggle');
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+
+        document.addEventListener('click', function (event) {
+            // Nếu click vào toggle
+            if (toggleBtn.contains(event.target)) {
+                dropdownMenu.classList.toggle('hidden');
+            } else {
+                // Click bên ngoài thì ẩn dropdown
+                if (!dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.add('hidden');
+                }
+            }
+        });
+    });
 </script>
+

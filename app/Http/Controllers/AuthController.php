@@ -149,4 +149,47 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('login');
     }
+
+    public function showAccount(Request $request)
+    {
+        $user = Auth::user();
+        $tab = $request->get('tab', 'profile');
+        $data = ['profile' => $user];
+
+        if ($tab === 'orders') {
+            $orders = $user->orders()->withCount('items')->latest()->get();
+            $data['orderHistory'] = $orders;
+        }
+
+        if ($tab === 'favorites') {
+            $favorites = $user->favorites()->latest()->get();
+            $data['favoriteProducts'] = $favorites;
+        }
+
+        return view('pages.account.index', $data);
+    }
+
+    public function updateAccount()
+    {
+
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('status', 'Mật khẩu đã được cập nhật thành công.');
+    }
 }

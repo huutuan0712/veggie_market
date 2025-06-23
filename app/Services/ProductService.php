@@ -39,12 +39,12 @@ class ProductService extends BaseService
         return ProductDTO::fromModel($product);
     }
 
-    public function update(int $id, array $attributes): Product
+    public function update(string|int $id, array $attributes): Product
     {
        return parent::update($id, $attributes);
     }
 
-   public function updateDTO($id, ProductDTO $dto): ?ProductDTO
+   public function updateDTO(string|int $id, ProductDTO $dto): ?ProductDTO
    {
        $attributes = $dto->toArray();
 

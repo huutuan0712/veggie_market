@@ -41,4 +41,8 @@ Route::resource('products', \App\Http\Controllers\ProductController::class);
 Route::resource('cart', \App\Http\Controllers\CartController::class);
 Route::resource('checkout', \App\Http\Controllers\CheckOutController::class);
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/account', [AuthController::class, 'showAccount'])->name('account');
+    Route::put('/account', [AuthController::class, 'updateAccount'])->name('account.update');
+    Route::post('/account/update-password', [AuthController::class, 'updatePassword'])->name('account.password.update');
+});

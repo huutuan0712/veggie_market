@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItems extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'order_items';
     protected $fillable = ['order_id', 'product_id', 'price', 'quantity'];

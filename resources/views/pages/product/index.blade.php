@@ -76,7 +76,7 @@
                             <a
                                 href="{{ route('products.show', $product->id) }}"
                                 class="w-full block text-center py-3 rounded-2xl font-semibold transition-all duration-300
-              {{ $product->inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
+                                {{ $product->inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
                             >
                                 {{ $product->inStock ? 'Xem chi tiết' : 'Hết hàng' }}
                             </a>

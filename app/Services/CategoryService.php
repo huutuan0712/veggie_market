@@ -35,12 +35,12 @@ class CategoryService extends BaseService
         return CategoryDTO::fromModel($category);
     }
 
-    public function update(int $id, array $attributes): Category
+    public function update(string|int $id, array $attributes): Category
     {
        return parent::update($id, $attributes);
     }
 
-    public function updateDTO ($id, CategoryDTO $dto): ?CategoryDTO
+    public function updateDTO (string|int $id, CategoryDTO $dto): ?CategoryDTO
     {
         $attributes= [];
 

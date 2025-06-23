@@ -31,5 +31,5 @@
 
 @include('partials.footer')
 
-@yield('script')
+@stack('scripts')
 </body>

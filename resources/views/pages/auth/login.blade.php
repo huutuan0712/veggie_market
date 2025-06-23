@@ -69,6 +69,10 @@
                         @enderror
                     </div>
 
+                    @if ($errors->has('error'))
+                        <div class="text-sm text-red-600 mt-4">{{ $errors->first('error') }}</div>
+                    @endif
+
                     {{-- Forgot Password --}}
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">

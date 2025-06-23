@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'orders';
     protected $fillable = ['user_id', 'total_price', 'status', 'shipping_address_id'];
@@ -21,5 +21,10 @@ class Order extends Model
     public function shipping()
     {
         return $this->belongsTo(ShippingAddress::class, 'shipping_address_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItems::class, 'order_id');
     }
 }
