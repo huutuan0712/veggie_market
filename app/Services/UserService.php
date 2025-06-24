@@ -43,12 +43,18 @@ class UserService extends BaseService
 
     public function updateDTO ($id, UserDTO $dto): ?UserDTO
     {
-        $attributes= [];
+        $attributes = [
+            'username' => $dto->username,
+            'full_name' => $dto->full_name,
+            'phone' => $dto->phone,
+            'gender' => $dto->gender,
+            'date_of_birth' => $dto->date_of_birth,
+            'image' => $dto->image,
+        ];
 
         $user = $this->update($id, $attributes);
         return UserDTO::fromModel($user);
     }
-
 
      public function getPaginatedList(array $params = []): UserCollection
      {

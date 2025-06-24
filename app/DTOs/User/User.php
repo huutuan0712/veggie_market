@@ -19,7 +19,9 @@ class User {
 
     public ?string $image = null;
 
-    public ?string $address = null;
+    public ?string $gender = null;
+
+    public ?string $date_of_birth = null;
 
     public ?string $created_at = null;
 
@@ -37,7 +39,8 @@ class User {
         $dto->full_name = $user->full_name;
         $dto->phone = $user->phone;
         $dto->image = $user->image;
-        $dto->address = $user->address;
+        $dto->gender = $user->gender;
+        $dto->date_of_birth = $user->date_of_birth?->format('Y-m-d');
         $dto->created_at = $user->created_at?->format('Y-m-d H:i:s');
         $dto->updated_at = $user->updated_at?->format('Y-m-d H:i:s');
         $dto->deleted_at = $user->deleted_at?->format('Y-m-d H:i:s');
@@ -54,7 +57,8 @@ class User {
         $dto->password = Hash::make($data['password']) ?? null;
         $dto->full_name = $data['full_name'] ?? null;
         $dto->phone = $data['phone'] ?? null;
-        $dto->address = $data['address'] ?? null;
+        $dto->gender = $data['gender'] ?? null;
+        $dto->date_of_birth = $data['date_of_birth'] ?? null;
 
         if(isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $path = $data['image']->store('avatars','public');
@@ -76,7 +80,8 @@ class User {
             'full_name' => $this->full_name,
             'phone' => $this->phone,
             'image' => $this->image,
-            'address' => $this->address,
+            'gender' => $this->gender,
+            'date_of_birth' => $this->date_of_birth,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,

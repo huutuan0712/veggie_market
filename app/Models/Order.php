@@ -11,16 +11,16 @@ class Order extends Model
     use HasFactory;
 
     protected $table = 'orders';
-    protected $fillable = ['user_id', 'total_price', 'status', 'shipping_address_id'];
+    protected $fillable = ['user_id', 'amount', 'discount_amount', 'status', 'address_id'];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function shipping()
+    public function addresses()
     {
-        return $this->belongsTo(ShippingAddress::class, 'shipping_address_id');
+        return $this->belongsTo(Address::class, 'address_id');
     }
 
     public function items()

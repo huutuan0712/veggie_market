@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\DTOs\User\User as UserDTO;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\User\UpdatePasswordRequest;
+use App\Http\Requests\User\UpdateProfileRequest;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -169,26 +171,29 @@ class AuthController extends Controller
         return view('pages.account.index', $data);
     }
 
-    public function updateAccount()
+    public function updateAccount(UpdateProfileRequest $request)
     {
+        $dto = UserDTO::fromRequest($request->validated());
+        $user = Auth::user();
 
+        $this->userService->updateDTO($user->id, $dto);
+
+        return back()->with('status', 'Thông tin tài khoản đã được cập nhật.');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
-        ]);
+        $data = $request->validated();
 
         $user = Auth::user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (!Hash::check($data['current_password'], $user->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
         }
 
-        $user->password = Hash::make($request->new_password);
-        $user->save();
+        $user->update([
+            'password' => Hash::make($data['new_password']),
+        ]);
 
         return back()->with('status', 'Mật khẩu đã được cập nhật thành công.');
     }
