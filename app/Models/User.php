@@ -6,13 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 use function Illuminate\Process\run;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'full_name',
+        'role',
         'phone',
         'image',
         'address'
@@ -60,5 +60,10 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->belongsToMany(Product::class, 'wishlists', 'user_id', 'product_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }

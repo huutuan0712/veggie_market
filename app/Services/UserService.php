@@ -31,7 +31,6 @@ class UserService extends BaseService
         $attributes = $dto->toArray();
 
         $user = $this->create($attributes);
-        $user->assignRole('user');
         $user->sendEmailVerificationNotification();
 
         return UserDTO::fromModel($user);

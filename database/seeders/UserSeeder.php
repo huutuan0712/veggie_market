@@ -16,34 +16,22 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = ['manage products', 'manage categories'];
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
-
-        $adminRole->givePermissionTo(Permission::all());
-
-        $userRole->givePermissionTo('manage products');
-
         $admin = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'username' => 'Admin',
                 'password' => Hash::make('password'),
+                'role' => 'admin',
             ]
         );
-        $admin->assignRole($adminRole);
 
         $user = User::firstOrCreate(
             ['email' => 'user@gmail.com'],
             [
                 'username' => 'User',
                 'password' => Hash::make('password'),
+                'role' => 'user',
             ]
         );
-        $user->assignRole($userRole);
     }
 }
