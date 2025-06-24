@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Product;
 use App\Enums\ProductStatus;
+use App\DTOs\Category\Category as CategoryDTO;
 
 class Product
 {
@@ -31,6 +32,8 @@ class Product
 
     public ?array $images;
 
+    public ?CategoryDTO $category = null;
+
 
     public static function fromModel(\App\Models\Product $product): self
     {
@@ -47,6 +50,8 @@ class Product
         $dto->created_at = $product->created_at?->format('Y-m-d H:i:s');
         $dto->updated_at = $product->updated_at?->format('Y-m-d H:i:s');
         $dto->deleted_at = $product->deleted_at?->format('Y-m-d H:i:s');
+
+        $dto->category = CategoryDTO::fromModel($product->category);
 
         $dto->images = $product->images->map(function ($image) {
             return [
@@ -69,7 +74,7 @@ class Product
         $dto->stock = $data['stock'] ?? null;
         $dto->status = isset($data['status']) ? ProductStatus::tryFrom($data['status']) : ProductStatus::IN_STOCK;
         $dto->unit = $data['unit'] ?? null;
-        $dto->images = $data['images'] ?? [;
+        $dto->images = $data['images'] ?? [];
 
         return $dto;
     }
@@ -87,6 +92,7 @@ class Product
             'status' => $this->status,
             'unit' => $this->unit,
             'images' => $this->images,
+            'category' => $this->category,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,

@@ -34,9 +34,9 @@ class ProductController extends Controller
             'sort_direction' => 'asc',
         ];
 
-        $selectedCategory = 'Tất cả';
+        $selectedCategory = 'tat-ca';
 
-        if ($request->filled('category') && $request->get('category') !== 'Tất cả') {
+        if ($request->filled('category') && $request->get('category') !== 'tat-ca') {
             $params['category'] = $request->get('category');
             $selectedCategory = $params['category'];
         }
@@ -75,24 +75,7 @@ class ProductController extends Controller
      */
     public function show(string $id, Request $request)
     {
-//        $product = $this->productService->getProductWithRelations($id);
-        $product = [
-            'id' => $id,
-            'name' => 'Xoài Hòa Lộc',
-            'category' => 'Trái cây nhiệt đới',
-            'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-            'price' => 50000,
-            'originalPrice' => 65000,
-            'description' => 'Xoài Hòa Lộc là loại xoài nổi tiếng với vị ngọt thanh, thơm dịu và ít xơ.',
-            'origin' => 'Tiền Giang, Việt Nam',
-            'inStock' => true,
-            'benefits' => [
-                'Tốt cho hệ tiêu hóa',
-                'Giàu vitamin C',
-                'Tăng cường miễn dịch',
-                'Làm đẹp da',
-            ],
-        ];
+        $product = $this->productService->getProductWithRelations($id);
         $activeTab = $request->query('tab', 'description');
 
         return view('pages.product.show', compact('product', 'activeTab'));

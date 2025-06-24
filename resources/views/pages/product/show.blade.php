@@ -23,24 +23,49 @@
                 {{-- Product Image --}}
                 <div class="space-y-4">
                     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-50 to-green-50">
-                        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="w-full h-96 lg:h-[500px] object-cover" />
-                        @if($product['originalPrice'])
-                            <div class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
-                                Giảm {{ round((($product['originalPrice'] - $product['price']) / $product['originalPrice']) * 100) }}%
-                            </div>
-                        @endif
+                        @php
+                            $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+
+                            $image = is_array($product->images) && count($product->images) > 0
+                                ? asset($product->images[0])
+                                : 'https://via.placeholder.com/300x200?text=No+Image';
+                        @endphp
+
+                        <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full h-96 lg:h-[500px] object-cover" />
+
+{{--                        @if($product->originalPrice)--}}
+{{--                            <div--}}
+{{--                                class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold">--}}
+{{--                                Giảm {{ round((($product->originalPrice - $product->price) / $product->originalPrice) * 100) }}--}}
+{{--                                %--}}
+{{--                            </div>--}}
+{{--                        @endif--}}
+                    </div>
+                    <div class="grid grid-cols-4 gap-4">
+                        @foreach($product->images as $index => $image)
+                            <button
+                                type="button"
+                                class="relative overflow-hidden rounded-xl border-2 border-gray-200 hover:border-orange-300 transition-all"
+                            >
+                                <img
+                                    src="{{ asset($image) }}"
+                                    alt="{{ $product->name }} {{ $index + 1 }}"
+                                    class="w-full h-20 object-cover"
+                                />
+                            </button>
+                        @endforeach
                     </div>
                 </div>
 
                 {{-- Product Info --}}
                 <div class="space-y-6">
                     <div>
-                        <span class="text-orange-600 font-medium text-sm">{{ $product['category'] }}</span>
-                        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">{{ $product['name'] }}</h1>
+                        <span class="text-orange-600 font-medium text-sm">{{ $product->category->name }}</span>
+                        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">{{ $product->name }}</h1>
                         <div class="flex items-center space-x-2 mb-4">
                             <div class="flex items-center space-x-1">
                                 @for ($i = 0; $i < 5; $i++)
-                                    <x-heroicon-s-star class="h-5 w-5 text-yellow-400" />
+                                    <x-heroicon-s-star class="h-5 w-5 text-yellow-400"/>
                                 @endfor
                             </div>
                             <span class="text-gray-600">(128 đánh giá)</span>
@@ -48,31 +73,25 @@
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <span class="text-3xl font-bold text-orange-600">{{ number_format($product['price'], 0, ',', '.') }}đ</span>
-                        @if($product['originalPrice'])
-                            <span class="text-xl text-gray-400 line-through">{{ number_format($product['originalPrice'], 0, ',', '.') }}đ</span>
-                        @endif
+                        <span class="text-3xl font-bold text-orange-600">{{ number_format($product->price, 0, ',', '.') }}đ</span>
+{{--                        @if($product->originalPrice)--}}
+{{--                            <span class="text-xl text-gray-400 line-through">{{ number_format($product->originalPrice, 0, ',', '.') }}đ</span>--}}
+{{--                        @endif--}}
                     </div>
 
-                    <p class="text-gray-600 text-lg leading-relaxed">{{ $product['description'] }}</p>
+                    <p class="text-gray-600 text-lg leading-relaxed">{{ $product->description }}</p>
 
                     {{-- Benefits --}}
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Lợi ích sức khỏe:</h3>
                         <div class="grid grid-cols-2 gap-2">
-                            @foreach ($product['benefits'] as $benefit)
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span class="text-gray-600">{{ $benefit }}</span>
-                                </div>
-                            @endforeach
+{{--                            @foreach ($product->benefits as $benefit)--}}
+{{--                                <div class="flex items-center space-x-2">--}}
+{{--                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>--}}
+{{--                                    <span class="text-gray-600">{{ $benefit }}</span>--}}
+{{--                                </div>--}}
+{{--                            @endforeach--}}
                         </div>
-                    </div>
-
-                    {{-- Origin --}}
-                    <div class="bg-orange-50 p-4 rounded-2xl">
-                        <h4 class="font-semibold text-gray-900 mb-1">Xuất xứ:</h4>
-                        <p class="text-gray-600">{{ $product['origin'] }}</p>
                     </div>
 
                     {{-- Quantity + Add to cart --}}
@@ -80,29 +99,28 @@
                         <div class="flex items-center space-x-4">
                             <span class="font-semibold text-gray-900">Số lượng:</span>
                             <div class="flex items-center border border-gray-200 rounded-xl">
-                                {{-- Giả sử xử lý với Alpine.js --}}
-                                <button class="p-3 hover:bg-gray-50" @click="quantity = Math.max(1, quantity - 1)">
-                                    <x-heroicon-o-minus class="h-4 w-4" />
+                                <button class="p-3 hover:bg-gray-50">
+                                    <x-heroicon-o-minus class="h-4 w-4"/>
                                 </button>
-                                <span class="px-6 py-3 font-semibold" x-text="quantity">1</span>
-                                <button class="p-3 hover:bg-gray-50" @click="quantity = quantity + 1">
-                                    <x-heroicon-o-plus class="h-4 w-4" />
+                                <span class="px-6 py-3 font-semibold">1</span>
+                                <button class="p-3 hover:bg-gray-50">
+                                    <x-heroicon-o-plus class="h-4 w-4"/>
                                 </button>
                             </div>
                         </div>
 
                         <div class="flex space-x-4">
                             <button
-                                @click="alert('Thêm vào giỏ hàng')"
                                 class="flex-1 py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2
-                                {{ $product['inStock'] ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
-                                {{ $product['inStock'] ? '' : 'disabled' }}
+                                {{ $inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
+                                {{ $inStock ? '' : 'disabled' }}
                             >
-                                <x-heroicon-o-shopping-cart class="h-5 w-5" />
-                                <span>{{ $product['inStock'] ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}</span>
+                                <x-heroicon-o-shopping-cart class="h-5 w-5"/>
+                                <span>{{ $inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}</span>
                             </button>
-                            <button class="px-6 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
-                                <x-heroicon-o-heart class="h-5 w-5" />
+                            <button
+                                class="px-6 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
+                                <x-heroicon-o-heart class="h-5 w-5"/>
                             </button>
                         </div>
                     </div>
@@ -153,7 +171,7 @@
                         <div class="prose max-w-none">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4">Mô tả sản phẩm</h3>
                             <p class="text-gray-600 leading-relaxed mb-6">
-                                {{ $product['description'] }} Được trồng và chăm sóc theo quy trình khép kín, đảm bảo chất lượng từ khâu gieo trồng đến thu hoạch.
+                                {{ $product->description }} Được trồng và chăm sóc theo quy trình khép kín, đảm bảo chất lượng từ khâu gieo trồng đến thu hoạch.
                             </p>
 
                             <h4 class="text-lg font-semibold text-gray-900 mb-3">Đặc điểm nổi bật:</h4>

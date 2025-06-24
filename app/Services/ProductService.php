@@ -69,7 +69,7 @@ class ProductService extends BaseService
         $includeDeleted = $params['include_deleted'] ?? false;
         $category = $params['category'] ?? null;
 
-        $query = $this->model->query();
+        $query = $this->model->newQuery()->with(['category']);
 
         // Include soft deleted items if requested
         if ($includeDeleted) {
@@ -77,8 +77,8 @@ class ProductService extends BaseService
         }
 
         if ($category) {
-            $query->whereHas('categories', function ($q) use ($category) {
-                $q->where('name', $category);
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('slug', $category);
             });
         }
         // Apply search filter if provided
@@ -101,7 +101,7 @@ class ProductService extends BaseService
 
     public function getProductWithRelations ($id): ?ProductDTO
     {
-        $query = $this->model->newQuery();
+        $query = $this->model->with('category')->newQuery();
         $product = $query->findOrFail($id);
 
         return ProductDTO::fromModel($product);
@@ -160,6 +160,4 @@ class ProductService extends BaseService
             $image->delete();
         }
     }
-
-
 }

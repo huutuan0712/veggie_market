@@ -31,11 +31,9 @@
                     @php
                         $cartCount = session('cart') ? collect(session('cart'))->sum('quantity') : 0;
                     @endphp
-                    @if($cartCount > 0)
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {{ $cartCount }}
-                        </span>
-                    @endif
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {{ $cartCount }}
+                    </span>
                 </a>
 
                 {{-- User --}}
@@ -113,33 +111,35 @@
     </div>
 </header>
 
-<script>
-    const toggle = document.getElementById('mobileMenuToggle');
-    const menu = document.getElementById('mobileNav');
-    const menuIcon = document.getElementById('menuIcon');
-    const closeIcon = document.getElementById('closeIcon');
+@push('script')
+    <script>
+        const toggle = document.getElementById('mobileMenuToggle');
+        const menu = document.getElementById('mobileNav');
+        const menuIcon = document.getElementById('menuIcon');
+        const closeIcon = document.getElementById('closeIcon');
 
-    toggle?.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-        menuIcon.classList.toggle('hidden');
-        closeIcon.classList.toggle('hidden');
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleBtn = document.getElementById('userDropdownToggle');
-        const dropdownMenu = document.getElementById('userDropdownMenu');
-
-        document.addEventListener('click', function (event) {
-            // Nếu click vào toggle
-            if (toggleBtn.contains(event.target)) {
-                dropdownMenu.classList.toggle('hidden');
-            } else {
-                // Click bên ngoài thì ẩn dropdown
-                if (!dropdownMenu.contains(event.target)) {
-                    dropdownMenu.classList.add('hidden');
-                }
-            }
+        toggle?.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
         });
-    });
-</script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('userDropdownToggle');
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+
+            document.addEventListener('click', function (event) {
+                // Nếu click vào toggle
+                if (toggleBtn.contains(event.target)) {
+                    dropdownMenu.classList.toggle('hidden');
+                } else {
+                    // Click bên ngoài thì ẩn dropdown
+                    if (!dropdownMenu.contains(event.target)) {
+                        dropdownMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+@endpush
 

@@ -30,9 +30,10 @@
                             class="px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
                             onchange="this.form.submit()"
                         >
+                            <option value="tat-ca" @selected($selectedCategory === 'tat-ca')>Tất cả</option>
                             @foreach($categories as $cat)
-                                <option value="{{ $cat }}" @selected($selectedCategory === $cat)>
-                                    {{ $cat }}
+                                <option value="{{ $cat->slug }}" @selected($selectedCategory === $cat->slug)>
+                                    {{ $cat->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -42,24 +43,40 @@
 
             {{-- Product Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                @forelse($products as $product)
+                @forelse($products->data as $product)
+                    @php
+                        $image = !empty($product->images) && is_array($product->images) && count($product->images) > 0
+                            ? asset($product->images[0])
+                            : 'https://via.placeholder.com/300x200?text=No+Image';
+
+                        $hasOriginalPrice = isset($product->originalPrice) && $product->originalPrice > $product->price;
+                        $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+                    @endphp
+
                     <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
                         <div class="relative overflow-hidden">
-                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
-                            @if($product->originalPrice)
-                                <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    Giảm {{ round((($product->originalPrice - $product->price) / $product->originalPrice) * 100) }}%
-                                </div>
-                            @endif
-                            @unless($product->inStock)
+                            <img
+                                src="{{ $image }}"
+                                alt="{{ $product->name ?? 'Sản phẩm' }}"
+                                class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+
+{{--                            @if($hasOriginalPrice)--}}
+{{--                                <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">--}}
+{{--                                    Giảm {{ round((($product->originalPrice - $product->price) / $product->originalPrice) * 100) }}%--}}
+{{--                                </div>--}}
+{{--                            @endif--}}
+
+                            @unless($inStock)
                                 <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
                                     <span class="text-white font-semibold">Hết hàng</span>
                                 </div>
                             @endunless
                         </div>
+
                         <div class="p-6">
                             <div class="mb-2">
-                                <span class="text-sm text-orange-600 font-medium">{{ $product->category }}</span>
+                                <span class="text-sm text-orange-600 font-medium">{{ $product->category->name ?? 'Chưa rõ danh mục' }}</span>
                             </div>
                             <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $product->name }}</h3>
                             <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product->description }}</p>
@@ -67,18 +84,18 @@
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-2xl font-bold text-orange-600">{{ number_format($product->price) }}đ</span>
-                                    @if($product->originalPrice)
-                                        <span class="text-gray-400 line-through text-sm">{{ number_format($product->originalPrice) }}đ</span>
-                                    @endif
+{{--                                    @if($hasOriginalPrice)--}}
+{{--                                        <span class="text-gray-400 line-through text-sm">{{ number_format($product->originalPrice) }}đ</span>--}}
+{{--                                    @endif--}}
                                 </div>
                             </div>
 
                             <a
                                 href="{{ route('products.show', $product->id) }}"
                                 class="w-full block text-center py-3 rounded-2xl font-semibold transition-all duration-300
-                                {{ $product->inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
+                                {{ $inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
                             >
-                                {{ $product->inStock ? 'Xem chi tiết' : 'Hết hàng' }}
+                                {{ $inStock ? 'Xem chi tiết' : 'Hết hàng' }}
                             </a>
                         </div>
                     </div>

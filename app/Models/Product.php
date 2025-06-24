@@ -22,7 +22,7 @@ class Product extends Model
         return $this->hasMany(ProductImages::class, 'product_id');
     }
 
-    public function categories()
+    public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
