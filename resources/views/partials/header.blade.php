@@ -29,9 +29,14 @@
                 <a href="{{ route('cart.index') }}" class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
                     <x-heroicon-o-shopping-cart class="h-6 w-6" />
                     @php
-                        $cartCount = session('cart') ? collect(session('cart'))->sum('quantity') : 0;
+                        if (Auth::check()) {
+                            $cartCount = \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity');
+                        } else {
+                            $cartCount = collect(session('cart'))->sum();
+                        }
                     @endphp
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {{ $cartCount }}
                     </span>
                 </a>

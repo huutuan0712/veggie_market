@@ -99,11 +99,18 @@
                         <div class="flex items-center space-x-4">
                             <span class="font-semibold text-gray-900">Số lượng:</span>
                             <div class="flex items-center border border-gray-200 rounded-xl">
-                                <button class="p-3 hover:bg-gray-50">
+                                <button type="button" class="p-3 hover:bg-gray-50" id="decreaseQty">
                                     <x-heroicon-o-minus class="h-4 w-4"/>
                                 </button>
-                                <span class="px-6 py-3 font-semibold">1</span>
-                                <button class="p-3 hover:bg-gray-50">
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    value="1"
+                                    min="1"
+                                    class="w-16 text-center font-semibold outline-none border-0 focus:ring-0"
+                                />
+                                <button type="button" class="p-3 hover:bg-gray-50" id="increaseQty">
                                     <x-heroicon-o-plus class="h-4 w-4"/>
                                 </button>
                             </div>
@@ -111,16 +118,14 @@
 
                         <div class="flex space-x-4">
                             <button
+                                id="addToCartBtn"
+                                data-product-id="{{ $product->id }}"
                                 class="flex-1 py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2
                                 {{ $inStock ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
                                 {{ $inStock ? '' : 'disabled' }}
                             >
                                 <x-heroicon-o-shopping-cart class="h-5 w-5"/>
                                 <span>{{ $inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}</span>
-                            </button>
-                            <button
-                                class="px-6 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
-                                <x-heroicon-o-heart class="h-5 w-5"/>
                             </button>
                         </div>
                     </div>
@@ -315,3 +320,59 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const decreaseBtn = document.getElementById('decreaseQty');
+            const increaseBtn = document.getElementById('increaseQty');
+            const quantityInput = document.getElementById('quantity');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+
+            decreaseBtn?.addEventListener('click', function () {
+                let qty = parseInt(quantityInput.value);
+                if (qty > 1) {
+                    quantityInput.value = qty - 1;
+                }
+            });
+
+            increaseBtn?.addEventListener('click', function () {
+                let qty = parseInt(quantityInput.value);
+                quantityInput.value = qty + 1;
+            });
+
+            addToCartBtn?.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const productId = this.dataset.productId;
+                const quantity = parseInt(quantityInput.value);
+
+                fetch("{{ route('cart.store') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: quantity
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const cartCountEl = document.getElementById('cart-count');
+                            if (cartCountEl && data.data.cartCount !== undefined) {
+                                cartCountEl.textContent = data.data.cartCount;
+                            }
+                        } else {
+                            alert("Lỗi khi thêm sản phẩm");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi:", error);
+                        alert("Đã xảy ra lỗi.");
+                    });
+            });
+        });
+    </script>
+@endpush
