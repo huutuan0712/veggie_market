@@ -127,6 +127,9 @@
                                 <x-heroicon-o-shopping-cart class="h-5 w-5"/>
                                 <span>{{ $inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}</span>
                             </button>
+                            <button class="px-6 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
+                                <x-heroicon-o-heart class="h-5 w-5" />
+                            </button>
                         </div>
                     </div>
 

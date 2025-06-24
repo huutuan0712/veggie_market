@@ -116,7 +116,7 @@
     </div>
 </header>
 
-@push('script')
+@push('scripts')
     <script>
         const toggle = document.getElementById('mobileMenuToggle');
         const menu = document.getElementById('mobileNav');

@@ -1,0 +1,379 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-green-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {{-- Header --}}
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">
+                        Dashboard Quản trị
+                    </h1>
+                    <p class="text-gray-600 mt-2">
+                        Chào mừng trở lại, {{ auth()->user()->name }}
+                    </p>
+                </div>
+                <a href="{{ url('/') }}"
+                   class="inline-flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
+                    <x-heroicon-o-arrow-left class="h-5 w-5"/>
+                    <span>Về trang chủ</span>
+                </a>
+            </div>
+
+            {{-- Navigation Tabs --}}
+            <div class="mb-8">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8">
+                        @php
+                            $activeTab = request('tab', 'overview');
+
+                            $tabs = [
+                                ['id' => 'overview', 'label' => 'Tổng quan', 'icon' => 'bar-chart-3'],
+                                ['id' => 'products', 'label' => 'Sản phẩm', 'icon' => 'package'],
+                                ['id' => 'categories', 'label' => 'Danh mục', 'icon' => 'funnel'],
+                                ['id' => 'orders', 'label' => 'Đơn hàng', 'icon' => 'shopping-cart'],
+                                ['id' => 'users', 'label' => 'Khách hàng', 'icon' => 'users'],
+                            ];
+
+                            function getStatusColor($status) {
+                                return match ($status) {
+                                    'Đang xử lý' => 'bg-yellow-100 text-yellow-800',
+                                    'Đã giao' => 'bg-green-100 text-green-800',
+                                    'Đã hủy' => 'bg-red-100 text-red-800',
+                                    default => 'bg-gray-100 text-gray-800',
+                                };
+                            }
+
+                        @endphp
+
+                        @foreach ($tabs as $tab)
+                            <a href="{{ request()->fullUrlWithQuery(['tab' => $tab['id']]) }}"
+                               class="flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors
+                                {{ $activeTab === $tab['id'] ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+
+                                {{-- Icons --}}
+                                @switch($tab['icon'])
+                                    @case('bar-chart-3')
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M3 3v18h18M9 17V9m4 8V5m4 8v-2"/>
+                                    </svg>
+                                    @break
+
+                                    @case('package')
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-package">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"/>
+                                        <path d="M12 12l8 -4.5"/>
+                                        <path d="M12 12l0 9"/>
+                                        <path d="M12 12l-8 -4.5"/>
+                                        <path d="M16 5.25l-8 4.5"/>
+                                    </svg>
+                                    @break
+
+                                    @case('funnel')
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-filter">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path
+                                            d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227z"/>
+                                    </svg>
+                                    @break
+
+                                    @case('shopping-cart')
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                                         data-slot="icon">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"></path>
+                                    </svg>
+                                    @break
+
+                                    @case('users')
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-users">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+                                    </svg>
+                                    @break
+                                @endswitch
+
+                                <span>{{ $tab['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </nav>
+                </div>
+            </div>
+            @if ($activeTab === 'overview')
+                <div class="space-y-8">
+                    {{-- Stats Cards --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {{-- Tổng sản phẩm --}}
+                        <div class="bg-white rounded-3xl shadow-lg p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Tổng sản phẩm</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ $stats['totalProducts'] }}</p>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-2xl">
+                                    {{-- Heroicon: Package --}}
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M3 7.5L12 3l9 4.5M3 7.5v9l9 4.5m0-13.5l9-4.5m-9 4.5v13.5m9-13.5v9l-9 4.5" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Tổng đơn hàng --}}
+                        <div class="bg-white rounded-3xl shadow-lg p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Tổng đơn hàng</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ $stats['totalOrders'] }}</p>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-2xl">
+                                    {{-- Heroicon: Shopping Cart --}}
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M2.25 3h1.5l1.5 9h12l1.5-6h-15m3 9a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm9 0a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Doanh thu --}}
+                        <div class="bg-white rounded-3xl shadow-lg p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Doanh thu</p>
+                                    <p class="text-3xl font-bold text-gray-900">
+                                        {{ number_format($stats['totalRevenue']) }}đ
+                                    </p>
+                                </div>
+                                <div class="bg-orange-100 p-3 rounded-2xl">
+                                    {{-- Heroicon: Dollar Sign --}}
+                                    <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M12 3v18m0 0a4.5 4.5 0 004.5-4.5v-.75a1.5 1.5 0 00-1.5-1.5H9a1.5 1.5 0 01-1.5-1.5V9A4.5 4.5 0 0112 4.5" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Tăng trưởng --}}
+                        <div class="bg-white rounded-3xl shadow-lg p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Tăng trưởng</p>
+                                    <p class="text-3xl font-bold text-gray-900">+{{ $stats['monthlyGrowth'] }}%</p>
+                                </div>
+                                <div class="bg-purple-100 p-3 rounded-2xl">
+                                    {{-- Heroicon: Trending Up --}}
+                                    <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M3 17l6-6 4 4 8-8" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Recent Orders --}}
+                    <div class="bg-white rounded-3xl shadow-lg p-8">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Đơn hàng gần đây</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Mã đơn</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Khách hàng</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Ngày</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Tổng tiền</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach ($recentOrders as $order)
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-4 px-4 font-medium text-gray-900">#{{ $order->id }}</td>
+                                        <td class="py-4 px-4 text-gray-600">{{ $order->customer }}</td>
+                                        <td class="py-4 px-4 text-gray-600">{{ $order->date }}</td>
+                                        <td class="py-4 px-4">
+                                                    <span class="px-3 py-1 rounded-full text-sm font-medium {{ getStatusColor($order->status) }}">
+                                                        {{ $order->status }}
+                                                    </span>
+                                        </td>
+                                        <td class="py-4 px-4 font-semibold text-gray-900">
+                                            {{ number_format($order->total) }}đ
+                                        </td>
+                                        <td class="py-4 px-4">
+                                            <a href="#"
+                                               class="text-orange-600 hover:text-orange-700 transition-colors">
+                                                {{-- Heroicon: Eye --}}
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                     stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25c4.478 0 8.268 2.694 9.542 6.75-1.274 4.057-5.064 6.75-9.542 6.75-4.477 0-8.268-2.693-9.542-6.75z" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($activeTab === 'products')
+                <div class="space-y-6">
+                    {{-- Products Header --}}
+                    <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                        <div class="flex flex-col sm:flex-row gap-4 flex-1">
+                            {{-- Search --}}
+                            <div class="relative flex-1 max-w-md">
+                                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                                </svg>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm sản phẩm..."
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    wire:model.debounce.300ms="searchTerm"
+                                />
+                            </div>
+
+                            {{-- Category filter --}}
+                            <select
+                                name="category"
+                                class="px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                onchange="this.form.submit()"
+                            >
+                                <option value="tat-ca" @selected($selectedCategory === 'tat-ca')>Tất cả</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->slug }}" @selected($selectedCategory === $cat->slug)>
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Add Product Button --}}
+                        <a href="{{ route('products.create') }}"
+                           class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center space-x-2">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                            </svg>
+                            <span>Thêm sản phẩm</span>
+                        </a>
+                    </div>
+
+                    {{-- Products Table --}}
+                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Sản phẩm</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Danh mục</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Giá</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @forelse ($products->data as $product)
+                                    @php
+                                        $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+
+                                        $image = is_array($product->images) && count($product->images) > 0
+                                            ? asset($product->images[0])
+                                            : 'https://via.placeholder.com/300x200?text=No+Image';
+                                    @endphp
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center space-x-4">
+                                                <img src="{{ $image }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-xl" />
+                                                <div>
+                                                    <div class="font-semibold text-gray-900">{{ $product->name }}</div>
+{{--                                                    <div class="text-sm text-gray-600">{{ $product->origin }}</div>--}}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6 text-gray-600">{{ $product->category->name }}</td>
+                                        <td class="py-4 px-6">
+                                            <div class="font-semibold text-gray-900">{{ number_format($product->price) }}đ</div>
+{{--                                            @if ($product->originalPrice)--}}
+{{--                                                <div class="text-sm text-gray-400 line-through">--}}
+{{--                                                    {{ number_format($product->originalPrice) }}đ--}}
+{{--                                                </div>--}}
+{{--                                            @endif--}}
+                                        </td>
+                                        <td class="py-4 px-6">
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium
+                                        {{ $inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $inStock ? 'Còn hàng' : 'Hết hàng' }}
+                                    </span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center space-x-2">
+                                                <a href="{{ route('products.show', $product->id) }}"
+                                                   class="text-blue-600 hover:text-blue-700 transition-colors">
+                                                    {{-- Eye Icon --}}
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5c4.5 0 8.25 2.85 9.75 7.5-1.5 4.65-5.25 7.5-9.75 7.5S3.75 16.65 2.25 12c1.5-4.65 5.25-7.5 9.75-7.5z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                                                    </svg>
+                                                </a>
+                                                <a href="{{ route('products.edit', $product->id) }}"
+                                                   class="text-orange-600 hover:text-orange-700 transition-colors">
+                                                    {{-- Edit Icon --}}
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M16.862 3.487a2.25 2.25 0 113.182 3.182L6.75 19.5H3v-3.75L16.862 3.487z" />
+                                                    </svg>
+                                                </a>
+                                                <button wire:click="delete({{ $product->id }})"
+                                                        class="text-red-600 hover:text-red-700 transition-colors">
+                                                    {{-- Trash Icon --}}
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-6 text-gray-500">Không có sản phẩm nào.</td>
+                                    </tr>
+                                @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+        </div>
+    </div>
+
+@endsection
