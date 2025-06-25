@@ -8,6 +8,7 @@ use App\DTOS\Category\Category as CategoryDTO;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 
 class CategoryService extends BaseService
 {
@@ -23,6 +24,9 @@ class CategoryService extends BaseService
 
     public function create(array $attributes): Category
     {
+        if (! isset($attributes['slug']) || empty($attributes['slug'])) {
+            $attributes['slug'] = Str::slug($attributes['name']);
+        }
         return parent::create($attributes);
     }
 
@@ -37,12 +41,19 @@ class CategoryService extends BaseService
 
     public function update(string|int $id, array $attributes): Category
     {
+        if ((! isset($attributes['slug']) || empty($attributes['slug'])) && isset($attributes['name'])) {
+            $attributes['slug'] = Str::slug($attributes['name']);
+        }
        return parent::update($id, $attributes);
     }
 
     public function updateDTO (string|int $id, CategoryDTO $dto): ?CategoryDTO
     {
-        $attributes= [];
+        if (empty($dto->slug) && !empty($dto->name)) {
+            $dto->slug = Str::slug($dto->name);
+        }
+
+        $attributes= $dto->toArray();
 
         $category = $this->update($id, $attributes);
         return CategoryDTO::fromModel($category);
@@ -57,12 +68,17 @@ class CategoryService extends BaseService
         $sortBy = $params['sort_by'] ?? 'name';
         $sortDirection = $params['sort_direction'] ?? 'asc';
         $includeDeleted = $params['include_deleted'] ?? false;
+        $category = $params['category'] ?? null;
 
         $query = $this->model->query();
 
         // Include soft deleted items if requested
         if ($includeDeleted) {
             $query->withTrashed();
+        }
+
+        if ($category) {
+            $query->where('slug', $category);
         }
 
         // Apply search filter if provided

@@ -393,6 +393,127 @@
                     @endif
                 </div>
             @endif
+            {{-- Danh sách danh mục --}}
+            @if ($activeTab === 'categories')
+                <div class="space-y-6">
+                    <form method="GET" action="{{ request()->url() }}" class="mb-8" id="filterForm">
+                        <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                            <div class="flex flex-col sm:flex-row gap-4 flex-1">
+                                {{-- Search --}}
+                                <div class="relative flex-1 max-w-md">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                                    </svg>
+                                    <input type="hidden" name="tab" value="{{ request('tab', $activeTab) }}">
+                                    <input
+                                        type="text"
+                                        name="search"
+                                        value="{{ request('search') }}"
+                                        placeholder="Tìm kiếm danh mục..."
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                    />
+                                </div>
+
+                                {{-- Category filter --}}
+                                <select
+                                    name="category"
+                                    onchange="this.form.submit()"
+                                    class="px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                >
+                                    <option value="tat-ca" {{ $selectedCategory === 'tat-ca' ? 'selected' : '' }}>Tất cả</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->slug }}" {{ $selectedCategory === $cat->slug ? 'selected' : '' }}>
+                                            {{ $cat->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Add Category Button --}}
+                            <a href="{{ route('categories.create') }}"
+                               class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center space-x-2">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                </svg>
+                                <span>Thêm danh mục</span>
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Tên danh mục</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Slug</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Mô tả</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @forelse ($categoriesList->data as $category)
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-4 px-6 text-gray-900 font-medium">{{ $category->name }}</td>
+                                        <td class="py-4 px-6 text-gray-700">{{ $category->slug }}</td>
+                                        <td class="py-4 px-6 text-gray-600">{{ $category->description ?? '-' }}</td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center space-x-2">
+                                                <a href="{{ route('categories.edit', $category->id) }}"
+                                                   class="text-orange-600 hover:text-orange-700 transition-colors">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
+                                                         viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M16.862 3.487a2.25 2.25 0 113.182 3.182L6.75 19.5H3v-3.75L16.862 3.487z"/>
+                                                    </svg>
+                                                </a>
+                                                <button type="button"
+                                                        onclick="confirmCategoryDelete({{ $category->id }})"
+                                                        class="text-red-600 hover:text-red-700 transition-colors">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
+                                                         viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M6 18L18 6M6 6l12 12"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-6 text-gray-500">Không có danh mục nào.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @if ($categoriesList->meta['last_page'] > 1)
+                            <x-pagination :meta="$categoriesList->meta" />
+                        @endif
+                        <div id="deleteCategoryModal"
+                             class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+                            <div class="bg-white rounded-xl p-6 w-full max-w-sm text-center shadow-xl max-h-[90vh] overflow-y-auto">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Xác nhận xóa?</h3>
+                                <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa danh mục này?</p>
+                                <form id="deleteCategoryForm" method="POST" action="">
+                                    @csrf
+                                    @method('DELETE')
+                                    <div class="flex justify-center space-x-3">
+                                        <button type="button" onclick="closeCategoryModal()"
+                                                class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy
+                                        </button>
+                                        <button type="submit"
+                                                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Xóa
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection
@@ -412,6 +533,21 @@
             const modal = document.getElementById('deleteModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+        }
+
+        function setCategoryAndSubmit(slug) {
+            document.getElementById('categoryInput').value = slug;
+            document.getElementById('filterForm').submit();
+        }
+
+        function confirmCategoryDelete(id) {
+            const form = document.getElementById('deleteCategoryForm');
+            form.action = '/categories/' + id;
+            document.getElementById('deleteCategoryModal').classList.remove('hidden');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('deleteCategoryModal').classList.add('hidden');
         }
     </script>
 @endpush

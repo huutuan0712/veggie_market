@@ -67,10 +67,13 @@ class DashboardController extends Controller
         $products = $this->productService->getPaginatedList($params);
         $categories = $this->categoryService->getAll();
 
+        $categoriesList = $this->categoryService->getPaginatedList($params);
+
         return view('pages.admin.dashboard', compact(
             'stats',
             'recentOrders',
             'categories',
+            'categoriesList',
             'products',
             'selectedCategory'
         ));

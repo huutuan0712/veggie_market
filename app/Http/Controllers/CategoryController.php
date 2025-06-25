@@ -10,12 +10,9 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    protected $categoryService;
-
-    public function __construct(CategoryService $categoryService)
-    {
-        $this->categoryService = $categoryService;
-    }
+    public function __construct(
+        protected CategoryService $categoryService,
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -30,7 +27,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create');
+        return view('pages.category.create-or-update');
     }
 
     /**
@@ -41,7 +38,7 @@ class CategoryController extends Controller
         $dto = CategoryDTO::fromRequest($request->validated());
         $this->categoryService->createDTO($dto);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Tạo danh mục thành công!');
+        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Tạo danh mục thành công!');
     }
 
     /**
@@ -59,7 +56,7 @@ class CategoryController extends Controller
     {
         $category = $this->categoryService->getCategoryWithRelations($id);
 
-        return view('admin.categories.edit', compact('category'));
+        return view('pages.category.create-or-update', compact('category'));
     }
 
     /**
@@ -70,7 +67,7 @@ class CategoryController extends Controller
         $dto = CategoryDTO::fromRequest($request->validated());
         $this->categoryService->updateDTO($id, $dto);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
+        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Cập nhật danh mục thành công!');
     }
 
     /**
@@ -79,6 +76,6 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $this->categoryService->delete($id);
-        return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công!');
+        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Xóa danh mục thành công!');
     }
 }

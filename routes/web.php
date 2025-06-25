@@ -41,6 +41,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::resource('products', \App\Http\Controllers\ProductController::class);
 Route::resource('cart', \App\Http\Controllers\CartController::class);
 Route::resource('checkout', \App\Http\Controllers\CheckOutController::class);
+Route::resource('categories', \App\Http\Controllers\CategoryController::class);
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');
