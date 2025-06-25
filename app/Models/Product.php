@@ -11,10 +11,12 @@ class Product extends Model
     use HasFactory;
 
     protected $table = 'products';
-    protected $fillable = ['name', 'slug', 'description', 'category_id', 'price', 'stock', 'status', 'unit'];
+    protected $fillable = ['name', 'slug', 'description', 'category_id', 'price', 'original_price', 'stock', 'status', 'featured', 'unit', 'benefits'];
 
     protected $casts = [
         'status' => \App\Enums\ProductStatus::class,
+        'benefits' => 'array',
+        'featured' => 'boolean',
     ];
 
     public function images()

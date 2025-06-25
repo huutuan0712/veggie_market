@@ -45,12 +45,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 @forelse($products->data as $product)
                     @php
-                        $image = !empty($product->images) && is_array($product->images) && count($product->images) > 0
-                            ? asset($product->images[0])
-                            : 'https://via.placeholder.com/300x200?text=No+Image';
+                        $image = is_array($product->images) && count($product->images) > 0
+                                                   ? asset('storage/' . $product->images[0]['path'])
+                                                   : 'https://via.placeholder.com/300x200?text=No+Image';
 
-                        $hasOriginalPrice = isset($product->originalPrice) && $product->originalPrice > $product->price;
-                        $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+                             $hasOriginalPrice = isset($product->original_price) && $product->original_price > $product->price;
+                             $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
                     @endphp
 
                     <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
@@ -61,11 +61,11 @@
                                 class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                             />
 
-{{--                            @if($hasOriginalPrice)--}}
-{{--                                <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">--}}
-{{--                                    Giảm {{ round((($product->originalPrice - $product->price) / $product->originalPrice) * 100) }}%--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
+                            @if($hasOriginalPrice)
+                                <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    Giảm {{ round((($product->original_price - $product->price) / $product->original_price) * 100) }}%
+                                </div>
+                            @endif
 
                             @unless($inStock)
                                 <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -84,9 +84,9 @@
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-2xl font-bold text-orange-600">{{ number_format($product->price) }}đ</span>
-{{--                                    @if($hasOriginalPrice)--}}
-{{--                                        <span class="text-gray-400 line-through text-sm">{{ number_format($product->originalPrice) }}đ</span>--}}
-{{--                                    @endif--}}
+                                    @if($hasOriginalPrice)
+                                        <span class="text-gray-400 line-through text-sm">{{ number_format($product->original_price) }}đ</span>
+                                    @endif
                                 </div>
                             </div>
 

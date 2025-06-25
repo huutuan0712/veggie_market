@@ -11,15 +11,10 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    protected $productService;
-
-    protected $categoryService;
-
-    public function __construct(ProductService $productService, CategoryService $categoryService)
-    {
-        $this->productService = $productService;
-        $this->categoryService = $categoryService;
-    }
+    public function __construct(
+        protected ProductService $productService,
+        protected CategoryService $categoryService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -58,7 +53,7 @@ class ProductController extends Controller
     {
         $categories = $this->categoryService->getAll();
 
-        return view('pages.product.create',compact(
+        return view('pages.product.create-or-update', compact(
             'categories'
         ));
     }
@@ -71,7 +66,7 @@ class ProductController extends Controller
         $dto = ProductDTO::fromRequest($request->validated());
         $this->productService->createDTO($dto);
 
-        return redirect()->route('admin.product.index')->with('success', 'Tạo sản phẩm thành công!');
+        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Tạo sản phẩm thành công!');
     }
 
     /**
@@ -91,8 +86,12 @@ class ProductController extends Controller
     public function edit(string $id)
     {
         $product = $this->productService->getProductWithRelations($id);
+        $categories = $this->categoryService->getAll();
 
-        return view('admin.product.edit', compact('product'));
+        return view('pages.product.create-or-update', compact(
+            'product',
+            'categories'
+        ));
     }
 
     /**
@@ -103,7 +102,7 @@ class ProductController extends Controller
         $dto = ProductDTO::fromRequest($request->validated());
         $this->productService->updateDTO($id, $dto);
 
-        return redirect()->route('admin.product.index')->with('success', 'Cật nhật sản phẩm thành công!');
+        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
     /**
@@ -112,6 +111,6 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         $this->productService->delete($id);
-        return redirect()->route('admin.product.index')->with('success', 'Xóa sản phẩm thành công!');
+        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Xóa sản phẩm thành công!');
     }
 }

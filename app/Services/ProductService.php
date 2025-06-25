@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductService extends BaseService
 {
@@ -25,13 +26,16 @@ class ProductService extends BaseService
 
     public function create(array $attributes): Product
     {
+        if (! isset($attributes['slug']) || empty($attributes['slug'])) {
+            $attributes['slug'] = Str::slug($attributes['name']);
+        }
+
         return parent::create($attributes);
     }
 
     public function createDTO (ProductDTO $dto): ?ProductDTO
     {
         $attributes = $dto->toArray();
-
         $product = $this->create($attributes);
 
         $this->handleProductImages($product, $dto->images);
@@ -41,11 +45,18 @@ class ProductService extends BaseService
 
     public function update(string|int $id, array $attributes): Product
     {
+          if ((! isset($attributes['slug']) || empty($attributes['slug'])) && isset($attributes['name'])) {
+            $attributes['slug'] = Str::slug($attributes['name']);
+        }
+
        return parent::update($id, $attributes);
     }
 
    public function updateDTO(string|int $id, ProductDTO $dto): ?ProductDTO
    {
+       if (empty($dto->slug) && !empty($dto->name)) {
+           $dto->slug = Str::slug($dto->name);
+       }
        $attributes = $dto->toArray();
 
        $product = $this->update($id, $attributes);

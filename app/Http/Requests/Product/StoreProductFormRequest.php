@@ -22,14 +22,19 @@ class StoreProductFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|unique:products,slug',
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'status'      => 'required|in:in_stock,out_stock',
-            'unit'        => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'status' => 'required|in:in_stock,out_stock',
+            'unit' => 'required|string|max:50',
+            'featured' => 'nullable|bool',
+            'benefits' => 'nullable|array',
+            'images' => 'nullable|array',
+            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 

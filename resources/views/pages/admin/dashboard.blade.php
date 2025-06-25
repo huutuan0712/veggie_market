@@ -116,6 +116,13 @@
                     </nav>
                 </div>
             </div>
+
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-2xl mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             @if ($activeTab === 'overview')
                 <div class="space-y-8">
                     {{-- Stats Cards --}}
@@ -245,45 +252,49 @@
             @if ($activeTab === 'products')
                 <div class="space-y-6">
                     {{-- Products Header --}}
-                    <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                        <div class="flex flex-col sm:flex-row gap-4 flex-1">
-                            {{-- Search --}}
-                            <div class="relative flex-1 max-w-md">
-                                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
-                                </svg>
-                                <input
-                                    type="text"
-                                    placeholder="Tìm kiếm sản phẩm..."
-                                    class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                                    wire:model.debounce.300ms="searchTerm"
-                                />
+                    <form method="GET" action="{{ request()->url() }}" class="mb-8">
+                        <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                            <div class="flex flex-col sm:flex-row gap-4 flex-1">
+                                    {{-- Search --}}
+                                    <div class="relative flex-1 max-w-md">
+                                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                                        </svg>
+                                        <input type="hidden" name="tab" value="{{ request('tab', $activeTab) }}">
+                                        <input
+                                            type="text"
+                                            name="search"
+                                            value="{{ request('search') }}"
+                                            placeholder="Tìm kiếm trái cây..."
+                                            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+
+                                    {{-- Category filter --}}
+                                    <select
+                                        name="category"
+                                        class="px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                        onchange="this.form.submit()"
+                                    >
+                                        <option value="tat-ca" @selected($selectedCategory === 'tat-ca')>Tất cả</option>
+                                        @foreach($categories as $cat)
+                                            <option value="{{ $cat->slug }}" @selected($selectedCategory === $cat->slug)>
+                                                {{ $cat->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                             </div>
 
-                            {{-- Category filter --}}
-                            <select
-                                name="category"
-                                class="px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
-                                onchange="this.form.submit()"
-                            >
-                                <option value="tat-ca" @selected($selectedCategory === 'tat-ca')>Tất cả</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->slug }}" @selected($selectedCategory === $cat->slug)>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {{-- Add Product Button --}}
+                            <a href="{{ route('products.create') }}"
+                               class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center space-x-2">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                </svg>
+                                <span>Thêm sản phẩm</span>
+                            </a>
                         </div>
-
-                        {{-- Add Product Button --}}
-                        <a href="{{ route('products.create') }}"
-                           class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center space-x-2">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                            </svg>
-                            <span>Thêm sản phẩm</span>
-                        </a>
-                    </div>
+                    </form>
 
                     {{-- Products Table --}}
                     <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
@@ -302,10 +313,9 @@
                                 @forelse ($products->data as $product)
                                     @php
                                         $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
-
                                         $image = is_array($product->images) && count($product->images) > 0
-                                            ? asset($product->images[0])
-                                            : 'https://via.placeholder.com/300x200?text=No+Image';
+                                                ? asset('storage/' . $product->images[0]['path'])
+                                                : 'https://via.placeholder.com/300x200?text=No+Image';
                                     @endphp
                                     <tr class="border-b border-gray-100">
                                         <td class="py-4 px-6">
@@ -313,18 +323,17 @@
                                                 <img src="{{ $image }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-xl" />
                                                 <div>
                                                     <div class="font-semibold text-gray-900">{{ $product->name }}</div>
-{{--                                                    <div class="text-sm text-gray-600">{{ $product->origin }}</div>--}}
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="py-4 px-6 text-gray-600">{{ $product->category->name }}</td>
                                         <td class="py-4 px-6">
                                             <div class="font-semibold text-gray-900">{{ number_format($product->price) }}đ</div>
-{{--                                            @if ($product->originalPrice)--}}
-{{--                                                <div class="text-sm text-gray-400 line-through">--}}
-{{--                                                    {{ number_format($product->originalPrice) }}đ--}}
-{{--                                                </div>--}}
-{{--                                            @endif--}}
+                                            @if ($product->original_price)
+                                                <div class="text-sm text-gray-400 line-through">
+                                                    {{ number_format($product->original_price) }}đ
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="py-4 px-6">
                                     <span class="px-3 py-1 rounded-full text-sm font-medium
@@ -334,28 +343,21 @@
                                         </td>
                                         <td class="py-4 px-6">
                                             <div class="flex items-center space-x-2">
-                                                <a href="{{ route('products.show', $product->id) }}"
-                                                   class="text-blue-600 hover:text-blue-700 transition-colors">
-                                                    {{-- Eye Icon --}}
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5c4.5 0 8.25 2.85 9.75 7.5-1.5 4.65-5.25 7.5-9.75 7.5S3.75 16.65 2.25 12c1.5-4.65 5.25-7.5 9.75-7.5z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                                                    </svg>
-                                                </a>
                                                 <a href="{{ route('products.edit', $product->id) }}"
-                                                   class="text-orange-600 hover:text-orange-700 transition-colors">
+                                                   class="text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
                                                     {{-- Edit Icon --}}
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                               d="M16.862 3.487a2.25 2.25 0 113.182 3.182L6.75 19.5H3v-3.75L16.862 3.487z" />
                                                     </svg>
                                                 </a>
-                                                <button wire:click="delete({{ $product->id }})"
-                                                        class="text-red-600 hover:text-red-700 transition-colors">
-                                                    {{-- Trash Icon --}}
+                                                <button
+                                                    type="button"
+                                                    onclick="confirmDelete({{ $product->id }})"
+                                                    class="text-red-600 hover:text-red-700 transition-colors cursor-pointer"
+                                                >
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M6 18L18 6M6 6l12 12" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
                                             </div>
@@ -368,12 +370,48 @@
                                 @endforelse
                                 </tbody>
                             </table>
+
+                            <!-- Modal xóa -->
+                            <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+                            <div class="bg-white rounded-xl p-6 w-full max-w-sm text-center shadow-xl">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Xác nhận xóa?</h3>
+                                    <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+                                    <form id="deleteForm" method="POST" action="">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="flex justify-center space-x-3">
+                                            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy</button>
+                                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Xóa</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    @if ($products->meta['last_page'] > 1)
+                        <x-pagination :meta="$products->meta" />
+                    @endif
                 </div>
             @endif
-
         </div>
     </div>
-
 @endsection
+@push('scripts')
+    <script>
+        function confirmDelete(productId) {
+            const modal = document.getElementById('deleteModal');
+            const form = document.getElementById('deleteForm');
+
+            form.action = `/products/${productId}`;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
+@endpush

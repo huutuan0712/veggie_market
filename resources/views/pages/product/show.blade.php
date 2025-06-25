@@ -27,19 +27,19 @@
                             $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
 
                             $image = is_array($product->images) && count($product->images) > 0
-                                ? asset($product->images[0])
-                                : 'https://via.placeholder.com/300x200?text=No+Image';
+                                                ? asset('storage/' . $product->images[0]['path'])
+                                                : 'https://via.placeholder.com/300x200?text=No+Image';
                         @endphp
 
                         <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full h-96 lg:h-[500px] object-cover" />
 
-{{--                        @if($product->originalPrice)--}}
-{{--                            <div--}}
-{{--                                class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold">--}}
-{{--                                Giảm {{ round((($product->originalPrice - $product->price) / $product->originalPrice) * 100) }}--}}
-{{--                                %--}}
-{{--                            </div>--}}
-{{--                        @endif--}}
+                        @if($product->original_price)
+                            <div
+                                class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
+                                Giảm {{ round((($product->original_price - $product->price) / $product->original_price) * 100) }}
+                                %
+                            </div>
+                        @endif
                     </div>
                     <div class="grid grid-cols-4 gap-4">
                         @foreach($product->images as $index => $image)
@@ -48,7 +48,7 @@
                                 class="relative overflow-hidden rounded-xl border-2 border-gray-200 hover:border-orange-300 transition-all"
                             >
                                 <img
-                                    src="{{ asset($image) }}"
+                                    src="{{ asset('storage/' . $image['path']) }}"
                                     alt="{{ $product->name }} {{ $index + 1 }}"
                                     class="w-full h-20 object-cover"
                                 />
@@ -74,9 +74,9 @@
 
                     <div class="flex items-center space-x-4">
                         <span class="text-3xl font-bold text-orange-600">{{ number_format($product->price, 0, ',', '.') }}đ</span>
-{{--                        @if($product->originalPrice)--}}
-{{--                            <span class="text-xl text-gray-400 line-through">{{ number_format($product->originalPrice, 0, ',', '.') }}đ</span>--}}
-{{--                        @endif--}}
+                        @if($product->original_price)
+                            <span class="text-xl text-gray-400 line-through">{{ number_format($product->original_price, 0, ',', '.') }}đ</span>
+                        @endif
                     </div>
 
                     <p class="text-gray-600 text-lg leading-relaxed">{{ $product->description }}</p>
@@ -85,12 +85,12 @@
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Lợi ích sức khỏe:</h3>
                         <div class="grid grid-cols-2 gap-2">
-{{--                            @foreach ($product->benefits as $benefit)--}}
-{{--                                <div class="flex items-center space-x-2">--}}
-{{--                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>--}}
-{{--                                    <span class="text-gray-600">{{ $benefit }}</span>--}}
-{{--                                </div>--}}
-{{--                            @endforeach--}}
+                            @foreach ($product->benefits as $benefit)
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-gray-600">{{ $benefit }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 

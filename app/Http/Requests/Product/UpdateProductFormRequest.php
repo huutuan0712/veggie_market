@@ -12,7 +12,7 @@ class UpdateProductFormRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,20 +23,24 @@ class UpdateProductFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => ['required', 'string', 'max:255'],
-            'slug'        => [
-                'required',
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => [
+                'nullable',
                 'string',
                 'max:255',
                 Rule::unique('products', 'slug')->ignore($this->route('product')),
             ],
             'category_id' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
-            'price'       => ['required', 'numeric', 'min:0'],
-            'stock'       => ['required', 'integer', 'min:0'],
-            'status'      => ['required', Rule::in(['in_stock', 'out_stock'])],
-            'unit'        => ['required', 'string', 'max:50'],
-            'images.*'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'original_price' => ['nullable', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'status' => ['required', Rule::in(['in_stock', 'out_stock'])],
+            'unit' => ['required', 'string', 'max:50'],
+            'images' => ['nullable', 'array', 'min:1'],
+            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'featured' => 'nullable|bool',
+            'benefits' => 'nullable|array',
         ];
     }
 

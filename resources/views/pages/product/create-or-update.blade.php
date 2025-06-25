@@ -19,11 +19,17 @@
                 </a>
             </div>
 
-            @if(session('success'))
-                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-2xl mb-6">
-                    {{ session('success') }}
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <strong>Đã có lỗi xảy ra:</strong>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
+
 
             <form action="{{ isset($product->id) ? route('products.update', $product->id) : route('products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -41,8 +47,9 @@
                                 </div>
                                 <x-form.input name="price" label="Giá bán *" type="number" value="{{ old('price', $product->price ?? '') }}" required />
                                 <x-form.input name="original_price" label="Giá gốc (tùy chọn)" type="number" value="{{ old('original_price', $product->original_price ?? '') }}" />
-                                <x-form.select name="category" label="Danh mục *" :options="$categories" value="{{ old('category', $product->category ?? '') }}" required />
-                                <x-form.input name="origin" label="Xuất xứ *" value="{{ old('origin', $product->origin ?? '') }}" required />
+                                <x-form.select name="category_id" label="Danh mục *" :options="$categories" value="{{ old('category', $product->category_id ?? '') }}" required />
+                                <x-form.input name="stock" type="number" label="Số lượng *" value="{{ old('stock', $product->stock ?? '') }}" required />
+                                <x-form.input name="unit" label="Đơn vị *" value="{{ old('unit', $product->unit ?? '') }}" required />
                                 <div class="md:col-span-2">
                                     <x-form.textarea name="description" label="Mô tả sản phẩm *" rows="4" value="{{ old('description', $product->description ?? '') }}" required />
                                 </div>
@@ -106,7 +113,7 @@
                     {{-- Sidebar --}}
                     <div class="lg:col-span-1 space-y-6">
                         {{-- Image Upload --}}
-                        <x-form.image-upload name="image" label="Hình ảnh sản phẩm" :value="$product->images ?? null" />
+                        <x-form.image-upload name="images" label="Hình ảnh sản phẩm" :value="$product->images ?? null" />
 
                         {{-- Actions --}}
                         <div class="bg-white rounded-3xl shadow-lg p-6">
