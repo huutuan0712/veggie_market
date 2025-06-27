@@ -69,13 +69,58 @@ class DashboardController extends Controller
 
         $categoriesList = $this->categoryService->getPaginatedList($params);
 
+        $orders = collect([
+            (object)[
+                'id' => 1001,
+                'customer' => (object)[
+                    'name' => 'Nguyễn Văn A',
+                    'email' => 'nguyenvana@example.com',
+                    'avatar' => 'https://i.pravatar.cc/80?img=1',
+                ],
+                'date' => now()->subDays(1),
+                'status' => 'processing',
+                'total' => 250000,
+                'items' => [
+                    ['name' => 'Sản phẩm A', 'quantity' => 1],
+                    ['name' => 'Sản phẩm B', 'quantity' => 2],
+                ]
+            ],
+            (object)[
+                'id' => 1002,
+                'customer' => (object)[
+                    'name' => 'Trần Thị B',
+                    'email' => 'tranthib@example.com',
+                    'avatar' => 'https://i.pravatar.cc/80?img=2',
+                ],
+                'date' => now()->subDays(2),
+                'status' => 'delivered',
+                'total' => 185000,
+                'items' => [
+                    ['name' => 'Sản phẩm C', 'quantity' => 1],
+                ]
+            ],
+            (object)[
+                'id' => 1003,
+                'customer' => (object)[
+                    'name' => 'Phạm Văn C',
+                    'email' => 'phamvanc@example.com',
+                    'avatar' => 'https://i.pravatar.cc/80?img=3',
+                ],
+                'date' => now()->subDays(3),
+                'status' => 'cancelled',
+                'total' => 0,
+                'items' => []
+            ],
+        ]);
+
         return view('pages.admin.dashboard', compact(
             'stats',
             'recentOrders',
             'categories',
             'categoriesList',
             'products',
-            'selectedCategory'
+            'selectedCategory',
+            'orders'
         ));
     }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,11 @@ Route::resource('products', \App\Http\Controllers\ProductController::class);
 Route::resource('cart', \App\Http\Controllers\CartController::class);
 Route::resource('checkout', \App\Http\Controllers\CheckOutController::class);
 Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
+Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');

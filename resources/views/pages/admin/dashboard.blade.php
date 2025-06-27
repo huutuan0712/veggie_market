@@ -35,15 +35,6 @@
                                 ['id' => 'users', 'label' => 'Khách hàng', 'icon' => 'users'],
                             ];
 
-                            function getStatusColor($status) {
-                                return match ($status) {
-                                    'Đang xử lý' => 'bg-yellow-100 text-yellow-800',
-                                    'Đã giao' => 'bg-green-100 text-green-800',
-                                    'Đã hủy' => 'bg-red-100 text-red-800',
-                                    default => 'bg-gray-100 text-gray-800',
-                                };
-                            }
-
                         @endphp
 
                         @foreach ($tabs as $tab)
@@ -231,13 +222,7 @@
                                             <a href="#"
                                                class="text-orange-600 hover:text-orange-700 transition-colors">
                                                 {{-- Heroicon: Eye --}}
-                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                     stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25c4.478 0 8.268 2.694 9.542 6.75-1.274 4.057-5.064 6.75-9.542 6.75-4.477 0-8.268-2.693-9.542-6.75z" />
-                                                </svg>
+                                                <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                         </td>
                                     </tr>
@@ -346,10 +331,7 @@
                                                 <a href="{{ route('products.edit', $product->id) }}"
                                                    class="text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
                                                     {{-- Edit Icon --}}
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M16.862 3.487a2.25 2.25 0 113.182 3.182L6.75 19.5H3v-3.75L16.862 3.487z" />
-                                                    </svg>
+                                                    <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </a>
                                                 <button
                                                     type="button"
@@ -461,11 +443,7 @@
                                             <div class="flex items-center space-x-2">
                                                 <a href="{{ route('categories.edit', $category->id) }}"
                                                    class="text-orange-600 hover:text-orange-700 transition-colors">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
-                                                         viewBox="0 0 24 24" stroke-width="1.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M16.862 3.487a2.25 2.25 0 113.182 3.182L6.75 19.5H3v-3.75L16.862 3.487z"/>
-                                                    </svg>
+                                                    <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </a>
                                                 <button type="button"
                                                         onclick="confirmCategoryDelete({{ $category->id }})"
@@ -514,6 +492,107 @@
                     </div>
                 </div>
             @endif
+
+            @if($activeTab === 'orders')
+                <div class="space-y-6">
+                    {{-- Orders Header --}}
+                    <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                        <h2 class="text-2xl font-bold text-gray-900">Quản lý đơn hàng</h2>
+                        <div class="flex flex-col sm:flex-row gap-4 items-center">
+                            <form method="GET" action="{{ request()->url() }}" class="relative">
+                                <x-heroicon-o-magnifying-glass class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Tìm kiếm đơn hàng..."
+                                    value="{{ request('search') }}"
+                                    class="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                />
+                                <input type="hidden" name="tab" value="{{ request('tab', $activeTab) }}">
+
+                                <select
+                                    name="status"
+                                    onchange="this.form.submit()"
+                                    class="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                                >
+                                    <option value="all">Tất cả trạng thái</option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                                    <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
+                                    <option value="shipping" {{ request('status') == 'shipping' ? 'selected' : '' }}>Đang giao</option>
+                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Đã giao</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                                </select>
+                            </form>
+
+                            <a href="{{ route('orders.export') }}" class="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition-colors flex items-center space-x-2">
+                                <x-heroicon-o-arrow-down-tray class="w-4 h-4" />
+                                <span>Xuất Excel</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Orders Table --}}
+                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Mã đơn</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Khách hàng</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Ngày đặt</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Sản phẩm</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Tổng tiền</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($orders as $order)
+                                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                        <td class="py-4 px-6 font-medium text-gray-900">#{{ $order->id }}</td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center space-x-3">
+                                                <img src="{{ $order->customer->avatar }}" alt="{{ $order->customer->name }}" class="w-8 h-8 rounded-full object-cover" />
+                                                <div>
+                                                    <div class="font-medium text-gray-900">{{ $order->customer->name }}</div>
+                                                    <div class="text-sm text-gray-600">{{ $order->customer->email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6 text-gray-600">
+                                            <div>{{ $order->date->format('d/m/Y') }}</div>
+                                            <div class="text-sm text-gray-500">{{ $order->date->format('H:i') }}</div>
+                                        </td>
+                                        <td class="py-4 px-6 text-gray-600">{{ count($order->items) }} sản phẩm</td>
+                                        <td class="py-4 px-6">
+{{--                                          <span class="inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium {{ getStatusColor($order->status) }}">--}}
+{{--                                            {!! getStatusIcon($order->status) !!}--}}
+{{--                                            <span>{{ getStatusText($order->status) }}</span>--}}
+{{--                                          </span>--}}
+                                        </td>
+                                        <td class="py-4 px-6 font-semibold text-gray-900">
+                                            {{ number_format($order->total) }}đ
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center space-x-2">
+                                                <a href="{{ route('orders.show', $order->id) }}" class="text-blue-600 hover:text-blue-700 transition-colors" title="Xem chi tiết">
+                                                    <x-heroicon-o-eye class="w-5 h-5" />
+                                                </a>
+                                                <a href="{{ route('orders.edit', $order->id) }}" class="text-orange-600 hover:text-orange-700 transition-colors" title="Chỉnh sửa">
+                                                    <x-heroicon-o-pencil-square class="w-5 h-5" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
         </div>
     </div>
 @endsection
