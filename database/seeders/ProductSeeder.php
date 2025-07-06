@@ -30,6 +30,13 @@ class ProductSeeder extends Seeder
                 'price' => fake()->randomFloat(2, 10, 100), // từ 10 đến 100 nghìn
                 'stock' => $stock,
                 'status' => $stock === 0 ? 'out_stock' : 'in_stock',
+                'benefits' => fake()->randomElements([
+                    'Giàu vitamin C',
+                    'Tăng cường hệ miễn dịch',
+                    'Hỗ trợ tiêu hóa',
+                    'Chứa nhiều chất xơ',
+                    'Hỗ trợ làm đẹp da',
+                ], fake()->numberBetween(1, 3)), // Random 1 đến 3 lợi ích
                 'unit' => fake()->randomElement($units),
             ]);
         }

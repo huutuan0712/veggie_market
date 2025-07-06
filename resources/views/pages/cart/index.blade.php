@@ -1,11 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen py-20">
+    <div class="min-h-screen py-20 flex items-center justify-center">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if(count($cartItems) === 0)
                 <div class="text-center py-20">
-                    <x-heroicon-o-shopping-cart class="w-6 h-6 text-orange-600" />
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
                     <p class="text-gray-600 mb-8">Hãy thêm một số trái cây tươi ngon vào giỏ hàng</p>
                     <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 inline-flex items-center space-x-2">
@@ -28,7 +27,7 @@
                     {{-- Cart Items --}}
                     <div class="lg:col-span-2 space-y-4">
                         @foreach($cartItems as $item)
-                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="cart-item bg-white rounded-2xl shadow-lg p-6">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0">
                                         <img src="{{ $item->image }}" alt="{{ $item->name }}" class="w-20 h-20 object-cover rounded-xl">
@@ -39,31 +38,23 @@
                                     </div>
                                     <div class="flex items-center space-x-3">
                                         <div class="flex items-center border border-gray-200 rounded-xl">
-                                            <form method="POST" action="{{ route('cart.update', $item->id) }}">
-                                                @csrf
-                                                @method('PUT')
-                                                <button name="action" value="decrease" class="p-2 hover:bg-gray-50 transition-colors">
+                                            <form class="cart-update-form flex items-center space-x-2" data-id="{{ $item->id }}">
+                                                <button type="button" class="btn-change-qty p-2 hover:bg-gray-50 transition-colors" data-delta="-1">
                                                     <x-heroicon-o-minus class="h-4 w-4" />
                                                 </button>
-                                                <span class="px-4 py-2 font-semibold">{{ $item->quantity }}</span>
-                                                <button name="action" value="increase" class="p-2 hover:bg-gray-50 transition-colors">
+
+                                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
+                                                       class="w-16 rounded px-2 py-1 text-center border-0 focus:outline-none focus:ring-0 quantity-input">
+
+                                                <button type="button" class="btn-change-qty p-2 hover:bg-gray-50 transition-colors" data-delta="1">
                                                     <x-heroicon-o-plus class="h-4 w-4" />
                                                 </button>
                                             </form>
                                         </div>
-                                        <form method="POST" action="{{ route('cart.destroy', $item->id) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                                <x-heroicon-o-trash class="h-5 w-5" />
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-gray-100">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Tổng cộng:</span>
-                                        <span class="text-xl font-bold text-gray-900">{{ number_format($item->price * $item->quantity) }}đ</span>
+                                        <button type="button" class="btn-delete-cart-item p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                data-id="{{ $item->id }}">
+                                            <x-heroicon-o-trash class="h-5 w-5" />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -93,9 +84,6 @@
                             <a href="{{ route('checkout.index') }}" class="w-full block text-center bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 mb-4">
                                 Thanh toán
                             </a>
-                            <div class="text-center text-sm text-gray-500">
-                                Miễn phí giao hàng cho đơn hàng trên 200.000đ
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -103,3 +91,88 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        const formUpdateQuantity = document.querySelectorAll('.cart-update-form');
+
+        formUpdateQuantity.forEach(function (form) {
+            const productId = form.dataset.id;
+            const input = form.querySelector('.quantity-input');
+            const btns = form.querySelectorAll('.btn-change-qty');
+
+            btns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    let quantity = parseInt(input.value) || 1;
+                    const delta = parseInt(btn.dataset.delta);
+                    quantity += delta;
+                    if (quantity < 1) quantity = 1;
+                    input.value = quantity;
+                    updateCart(productId, quantity);
+                });
+            });
+
+            input.addEventListener('change', function () {
+                let quantity = parseInt(input.value) || 1;
+                if (quantity < 1) quantity = 1;
+                input.value = quantity;
+                updateCart(productId, quantity);
+            });
+        });
+
+        function updateCart(productId, quantity) {
+            fetch('/cart/' + productId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ quantity: quantity })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Cập nhật thành công', data);
+                })
+                .catch(error => {
+                    console.error('Cập nhật thất bại', error);
+                });
+        }
+        const deleteButtons = document.querySelectorAll('.btn-delete-cart-item');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = button.dataset.id;
+
+                if (confirm('Bạn có chắc muốn xoá sản phẩm này?')) {
+                    fetch('/cart/' + productId, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Request failed');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Đã xoá thành công', data);
+                            button.closest('.cart-item').remove();
+                            document.querySelector('#cart-count').textContent = data.cartCount;
+                            const remainingItems = document.querySelectorAll('.cart-item');
+                            if (remainingItems.length === 0) {
+                                location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi xoá:', error);
+                        });
+                }
+            });
+        });
+    </script>
+@endpush

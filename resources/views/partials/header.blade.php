@@ -30,9 +30,9 @@
                     <x-heroicon-o-shopping-cart class="h-6 w-6" />
                     @php
                         if (Auth::check()) {
-                            $cartCount = \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity');
+                             $cartCount = \App\Models\CartItem::where('user_id', Auth::id())->count();
                         } else {
-                            $cartCount = collect(session('cart'))->sum();
+                             $cartCount = count(session('cart', []));
                         }
                     @endphp
 
@@ -134,11 +134,11 @@
             const dropdownMenu = document.getElementById('userDropdownMenu');
 
             document.addEventListener('click', function (event) {
-                // Nếu click vào toggle
+                if (!toggleBtn || !dropdownMenu) return;
+
                 if (toggleBtn.contains(event.target)) {
                     dropdownMenu.classList.toggle('hidden');
                 } else {
-                    // Click bên ngoài thì ẩn dropdown
                     if (!dropdownMenu.contains(event.target)) {
                         dropdownMenu.classList.add('hidden');
                     }

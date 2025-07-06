@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\User\UpdatePasswordRequest;
 use App\Http\Requests\User\UpdateProfileRequest;
+use App\Models\CartItem;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -41,9 +42,25 @@ class AuthController extends Controller
 
                 $user = Auth::user();
 
-                if ($user->hasRole('admin')) {
+                $sessionCart = session()->pull('cart', []);
+                foreach ($sessionCart as $productId => $quantity) {
+                    $existing = CartItem::where('user_id', $user->id)
+                        ->where('product_id', $productId)
+                        ->first();
+
+                    if ($existing) {
+                        $existing->increment('quantity', $quantity);
+                    } else {
+                        CartItem::create([
+                            'user_id' => $user->id,
+                            'product_id' => $productId,
+                            'quantity' => $quantity,
+                        ]);
+                    }
+                }
+                if ($user->isAdmin()) {
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập với quyền quản trị');
-                } elseif ($user->hasRole('user')) {
+                } elseif (!$user->isAdmin()) {
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công');
                 } else {
                     Auth::logout();

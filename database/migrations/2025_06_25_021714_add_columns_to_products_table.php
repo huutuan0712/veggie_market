@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->boolean('featured')->default(false)->after('status');
-            $table->decimal('original_price', 10, 2)->after('price');
-            $table->json('benefits')->after('featured');
+            $table->decimal('original_price', 10, 2)->nullable()->after('price');
+            $table->json('benefits')->nullable()->after('featured');
         });
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Cart\AddCartRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\CartItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,25 +16,47 @@ class CartController extends Controller
      */
     public function index()
     {
-        // Fake cart items as a collection
-        $cartItems = collect([
-            (object)[
-                'id' => 1,
-                'name' => 'Xoài Hòa Lộc',
-                'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'price' => 50000,
-                'quantity' => 2,
-            ],
-            (object)[
-                'id' => 2,
-                'name' => 'Dâu tây Đà Lạt',
-                'image' => 'https://images.pexels.com/photos/1125328/pexels-photo-1125328.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'price' => 80000,
-                'quantity' => 1,
-            ],
-        ]);
+        $user = Auth::user();
 
-        $total = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        if ($user) {
+            $cartItems = CartItem::with('product')
+                ->where('user_id', $user->id)
+                ->get()
+                ->map(function ($item) {
+                    return (object)[
+                        'id' => $item->product->id,
+                        'name' => $item->product->name,
+                        'image' => $item->product->image,
+                        'price' => $item->product->price,
+                        'quantity' => $item->quantity,
+                    ];
+                });
+
+            $total = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        } else {
+            $cart = session()->get('cart', []);
+
+            if (empty($cart)) {
+                $cartItems = collect();
+                $total = 0;
+            } else {
+                $productIds = array_keys($cart);
+
+                $products = Product::with('images')->whereIn('id', $productIds)->get();
+
+                $cartItems = $products->map(function ($product) use ($cart) {
+                    return (object)[
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'image' => $product->images->first() ?->path,
+                        'price' => $product->price,
+                        'quantity' => $cart[$product->id]
+                    ];
+                });
+
+                $total = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+            }
+        }
 
         return view('pages.cart.index', compact('cartItems', 'total'));
     }
@@ -141,7 +164,42 @@ class CartController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $quantity = max((int) $request->input('quantity'), 1);
+        $user = Auth::user();
+
+        if ($user) {
+            // Đã đăng nhập → update trong DB
+            $cartItem = CartItem::where('user_id', $user->id)
+                ->where('product_id', $id)
+                ->first();
+
+            if ($cartItem) {
+                $cartItem->update(['quantity' => $quantity]);
+            } else {
+                // Nếu chưa có, có thể tạo mới (tùy logic bạn muốn)
+                CartItem::create([
+                    'user_id' => $user->id,
+                    'product_id' => $id,
+                    'quantity' => $quantity,
+                ]);
+            }
+        } else {
+            // Chưa đăng nhập → update trong session
+            $cart = session()->get('cart', []);
+            if (isset($cart[$id])) {
+                $cart[$id] = $quantity;
+                session()->put('cart', $cart);
+            } else {
+                // Có thể thêm mới nếu cần:
+                $cart[$id] = $quantity;
+                session()->put('cart', $cart);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Cập nhật giỏ hàng thành công.',
+            'quantity' => $quantity,
+        ]);
     }
 
     /**
@@ -149,6 +207,22 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = Auth::user();
+
+        if ($user) {
+            CartItem::where('user_id', $user->id)->where('product_id', $id)->delete();
+            $cartCount = CartItem::where('user_id', $user->id)->count();
+        } else {
+            $cart = session()->get('cart', []);
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+            $cartCount = count($cart);
+        }
+
+        return response()->json([
+            'message' => 'Đã xoá sản phẩm',
+            'cartCount' => $cartCount,
+        ]);
     }
+
 }
