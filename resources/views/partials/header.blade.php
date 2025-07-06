@@ -43,26 +43,24 @@
 
                 {{-- User --}}
                 @auth
-                    <div class="relative">
-                        <button
-                            id="userDropdownToggle"
-                            class="flex items-center space-x-2 bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm font-medium text-gray-700"
-                        >
-                            <span class="hidden sm:block">{{ Auth::user()->username }}</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </button>
+                    <details class="dropdown">
+                        <summary class="m-1 flex items-center space-x-3 cursor-pointer">
+                            <div class="avatar">
+                                <div class="ring-primary ring-offset-base-100 w-9 rounded-full ring-2 ring-offset-2">
+                                    <img src="{{ Auth::user()->image ?? 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200' }}" />
+                                </div>
+                            </div>
+                            <span class="text-base font-medium text-gray-800">{{ Auth::user()->username }}</span>
+                        </summary>
 
-                        <div
-                            id="userDropdownMenu"
-                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"
-                        >
-                            <a href="{{ route('account', ['tab' => 'profile'])}}"
-                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                Hồ sơ
-                            </a>
 
+                        <ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                            <li>
+                                <a href="{{ route('account', ['tab' => 'profile'])}}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Hồ sơ
+                                </a>
+                            </li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button
@@ -72,8 +70,8 @@
                                     Đăng xuất
                                 </button>
                             </form>
-                        </div>
-                    </div>
+                        </ul>
+                    </details>
                 @else
                     <a href="{{ route('login') }}" class="flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition-colors">
                         <x-heroicon-o-user class="h-5 w-5" />
@@ -127,23 +125,6 @@
             menu.classList.toggle('hidden');
             menuIcon.classList.toggle('hidden');
             closeIcon.classList.toggle('hidden');
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleBtn = document.getElementById('userDropdownToggle');
-            const dropdownMenu = document.getElementById('userDropdownMenu');
-
-            document.addEventListener('click', function (event) {
-                if (!toggleBtn || !dropdownMenu) return;
-
-                if (toggleBtn.contains(event.target)) {
-                    dropdownMenu.classList.toggle('hidden');
-                } else {
-                    if (!dropdownMenu.contains(event.target)) {
-                        dropdownMenu.classList.add('hidden');
-                    }
-                }
-            });
         });
     </script>
 @endpush
