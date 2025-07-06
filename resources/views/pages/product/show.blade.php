@@ -5,7 +5,6 @@
         $activeTab = request('tab', 'description');
         $tabs = [
             ['id' => 'description', 'label' => 'Mô tả'],
-            ['id' => 'attributes', 'label' => 'Thông số'],
             ['id' => 'reviews', 'label' => 'Đánh giá (' . 0 . ')'],
         ];
     @endphp
@@ -196,27 +195,6 @@
                             </p>
                         </div>
                     @endif
-
-                    {{-- Attributes Tab --}}
-                    @if ($activeTab === 'attributes')
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Thông số sản phẩm</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                @foreach ($attributes as $attr)
-                                    <div class="bg-gray-50 p-4 rounded-2xl">
-                                        <div class="flex items-center space-x-3">
-                                            <span class="text-2xl">{{ $attr['icon'] ?? '' }}</span>
-                                            <div>
-                                                <div class="font-semibold text-gray-900">{{ $attr['name'] }}</div>
-                                                <div class="text-gray-600">{{ $attr['value'] }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
                     {{-- Reviews Tab --}}
                     @if ($activeTab === 'reviews')
                         <div>

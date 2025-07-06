@@ -13,8 +13,8 @@
                         <h1 class="text-4xl lg:text-6xl font-bold leading-tight">
                             Trái cây
                             <span class="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-200">
-                Tươi ngon
-              </span>
+                                Tươi ngon
+                            </span>
                             mỗi ngày
                         </h1>
                         <p class="text-xl text-orange-100 max-w-lg">
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#"
+                        <a href="{{ route('products.index') }}"
                            class="bg-white text-orange-600 px-8 py-4 rounded-2xl font-semibold hover:bg-orange-50 transition-all duration-300 flex items-center justify-center space-x-2 shadow-xl">
                             <span>Mua ngay</span>
                             <x-heroicon-o-arrow-right class="h-4 w-4" />
@@ -116,42 +116,6 @@
             </div>
         </div>
     </section>
-    @php
-        $featuredProducts = [
-                [
-                    'id' => 1,
-                    'name' => 'Xoài Hòa Lộc',
-                    'description' => 'Ngọt thơm tự nhiên',
-                    'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-                    'price' => 50000,
-                    'originalPrice' => 65000,
-                ],
-                [
-                    'id' => 2,
-                    'name' => 'Dâu tây Đà Lạt',
-                    'description' => 'Tươi ngon cao cấp',
-                    'image' => 'https://images.pexels.com/photos/1125328/pexels-photo-1125328.jpeg?auto=compress&cs=tinysrgb&w=400',
-                    'price' => 90000,
-                    'originalPrice' => null,
-                ],
-                [
-                    'id' => 3,
-                    'name' => 'Nho nhập khẩu',
-                    'description' => 'Chất lượng quốc tế',
-                    'image' => 'https://images.pexels.com/photos/708777/pexels-photo-708777.jpeg?auto=compress&cs=tinysrgb&w=400',
-                    'price' => 120000,
-                    'originalPrice' => 150000,
-                ],
-                [
-                    'id' => 4,
-                    'name' => 'Dưa hấu ngọt',
-                    'description' => 'Giải nhiệt mùa hè',
-                    'image' => 'https://images.pexels.com/photos/1068584/pexels-photo-1068584.jpeg?auto=compress&cs=tinysrgb&w=400',
-                    'price' => 40000,
-                    'originalPrice' => null,
-                ],
-            ];
-    @endphp
     <section class="py-20 bg-gradient-to-br from-orange-50 to-green-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -165,22 +129,29 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach ($featuredProducts as $product)
-                    <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                    <div
+                        class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
                         <div class="relative overflow-hidden">
-                            <img
-                                src="{{ $product['image'] }}"
-                                alt="{{ $product['name'] }}"
-                                class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                            @if ($product['originalPrice'])
-                                <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    Giảm {{ round((($product['originalPrice'] - $product['price']) / $product['originalPrice']) * 100) }}%
-                                </div>
-                            @endif
+                            <a href="{{ route('products.show', ['product' => $product['id']]) }}">
+                                <img
+                                    src="{{ $product['image'] }}"
+                                    alt="{{ $product['name'] }}"
+                                    class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                                @if ($product['originalPrice'])
+                                    <div
+                                        class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                        Giảm {{ round((($product['originalPrice'] - $product['price']) / $product['originalPrice']) * 100) }}
+                                        %
+                                    </div>
+                                @endif
+                            </a>
                         </div>
 
                         <div class="p-6">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $product['name'] }}</h3>
+                            <a href="{{ route('products.show', ['product' => $product['id']]) }}">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $product['name'] }}</h3>
+                            </a>
                             <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product['description'] }}</p>
 
                             <div class="flex items-center justify-between mb-4">
@@ -196,12 +167,12 @@
                                 </div>
                             </div>
 
-                            <a
-                                href="{{ route('products.show', ['product' => $product['id']]) }}"
-                                class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center justify-center space-x-2"
+                            <button
+                                class="btn-add-to-cart w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center justify-center space-x-2"
+                                data-id="{{ $product->id }}"
                             >
                                 <span>Mua ngay</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -220,3 +191,40 @@
     </section>
 
 @endsection
+@push('scripts')
+    <script>
+        const addToCartButtons = document.querySelectorAll('.btn-add-to-cart');
+
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = button.dataset.id;
+
+                fetch('/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Request failed');
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Đã thêm vào giỏ hàng', data);
+                        const cartCountEl = document.getElementById('cart-count');
+                        if (cartCountEl && data.data.cartCount !== undefined) {
+                            cartCountEl.textContent = data.data.cartCount;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi thêm vào giỏ hàng:', error);
+                    });
+            });
+        });
+    </script>
+@endpush

@@ -24,6 +24,11 @@ class ProductService extends BaseService
         $this->model = $model;
     }
 
+    public function where($column, $value)
+    {
+        return $this->model->where($column, $value);
+    }
+
     public function create(array $attributes): Product
     {
         if (! isset($attributes['slug']) || empty($attributes['slug'])) {
