@@ -42,22 +42,6 @@ class AuthController extends Controller
 
                 $user = Auth::user();
 
-                $sessionCart = session()->pull('cart', []);
-                foreach ($sessionCart as $productId => $quantity) {
-                    $existing = CartItem::where('user_id', $user->id)
-                        ->where('product_id', $productId)
-                        ->first();
-
-                    if ($existing) {
-                        $existing->increment('quantity', $quantity);
-                    } else {
-                        CartItem::create([
-                            'user_id' => $user->id,
-                            'product_id' => $productId,
-                            'quantity' => $quantity,
-                        ]);
-                    }
-                }
                 if ($user->isAdmin()) {
                     return redirect()->route('admin.dashboard')->with('success', 'Đăng nhập với quyền quản trị');
                 } elseif (!$user->isAdmin()) {

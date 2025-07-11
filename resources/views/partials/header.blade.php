@@ -41,6 +41,22 @@
                     </span>
                 </a>
 
+                {{-- Favorites --}}
+                <a href="{{ route('wishlists') }}" class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
+                    <x-heroicon-o-heart class="h-6 w-6"  />
+                    @php
+                        if (Auth::check()) {
+                             $listCount = \App\Models\WishList::where('user_id', Auth::id())->count();
+                        } else {
+                             $listCount = count(session('wishlist', []));
+                        }
+                    @endphp
+
+                    <span id="farovites-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {{ $listCount }}
+                    </span>
+                </a>
+
                 {{-- User --}}
                 @auth
                     <details class="dropdown">
