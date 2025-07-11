@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,10 @@ Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+
+Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlists');
+Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+Route::post('/wishlists/update-quantity', [WishlistController::class, 'updateQuantity'])->name('wishlist.updateQuantity');
 
 
 Route::middleware('auth')->group(function () {
