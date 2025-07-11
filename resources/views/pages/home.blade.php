@@ -168,7 +168,7 @@
                             </div>
 
                             <button
-                                class="btn-add-to-cart w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center justify-center space-x-2"
+                                class="btn-add-to-cart w-full bg-gradient-to-r from-orange-500 cursor-pointer to-red-500 text-white py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center justify-center space-x-2"
                                 data-id="{{ $product->id }}"
                             >
                                 <span>Mua ngay</span>

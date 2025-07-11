@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen py-20 flex items-center justify-center">
+    <div class="min-h-screen py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if(count($cartItems) === 0)
                 <div class="text-center py-20">
@@ -68,7 +68,7 @@
                             <div class="space-y-4 mb-6">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Tạm tính:</span>
-                                    <span class="font-semibold">{{ number_format($total) }}đ</span>
+                                    <span class="font-semibold" id="cart-total-amount">{{ number_format($total) }}đ</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Phí giao hàng:</span>
@@ -77,7 +77,7 @@
                                 <div class="border-t border-gray-200 pt-4">
                                     <div class="flex justify-between items-center">
                                         <span class="text-lg font-semibold text-gray-900">Tổng cộng:</span>
-                                        <span class="text-2xl font-bold text-orange-600">{{ number_format($total) }}đ</span>
+                                        <span class="text-2xl font-bold text-orange-600" id="cart-total">{{ number_format($total) }}đ</span>
                                     </div>
                                 </div>
                             </div>
@@ -135,12 +135,19 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Cập nhật thành công', data);
+                    const totalElement = document.getElementById('cart-total-amount');
+                    const totalCart = document.getElementById('cart-total');
+
+                    if (data.total) {
+                        totalElement.textContent = new Intl.NumberFormat('vi-VN').format(data.total) + 'đ';
+                        totalCart.textContent = new Intl.NumberFormat('vi-VN').format(data.total) + 'đ';
+                    }
                 })
                 .catch(error => {
                     console.error('Cập nhật thất bại', error);
                 });
         }
+
         const deleteButtons = document.querySelectorAll('.btn-delete-cart-item');
 
         deleteButtons.forEach(button => {
