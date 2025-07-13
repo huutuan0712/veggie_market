@@ -129,12 +129,18 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach ($featuredProducts as $product)
+                    @php
+                        $image = $product['images'] && count($product['images']) > 0
+                                                   ? asset('storage/' . $product->images[0]['path'])
+                                                   : 'https://via.placeholder.com/300x200?text=No+Image';
+
+                    @endphp
                     <div
                         class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
                         <div class="relative overflow-hidden">
                             <a href="{{ route('products.show', ['product' => $product['id']]) }}">
                                 <img
-                                    src="{{ $product['image'] }}"
+                                    src="{{ $image }}"
                                     alt="{{ $product['name'] }}"
                                     class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                                 />

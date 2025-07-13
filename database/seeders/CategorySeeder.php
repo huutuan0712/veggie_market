@@ -15,10 +15,10 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Trái cây tươi',
-            'Trái cây nhập khẩu',
-            'Trái cây sấy khô',
-            'Nước ép trái cây',
+            'Fruits',
+            'Vegetable',
+            'Nuts',
+            'Spices',
         ];
 
         foreach ($categories as $name) {
