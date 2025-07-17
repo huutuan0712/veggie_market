@@ -27,10 +27,13 @@
                     {{-- Cart Items --}}
                     <div class="lg:col-span-2 space-y-4">
                         @foreach($cartItems as $item)
+                            @php
+                                $image = $item->image ? asset('storage/' . $item->image): 'https://via.placeholder.com/300x200?text=No+Image';
+                            @endphp
                             <div class="cart-item bg-white rounded-2xl shadow-lg p-6">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0">
-                                        <img src="{{ $item->image }}" alt="{{ $item->name }}" class="w-20 h-20 object-cover rounded-xl">
+                                        <img src="{{ $image }}" alt="{{ $item->name }}" class="w-20 h-20 object-cover rounded-xl">
                                     </div>
                                     <div class="flex-1">
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $item->name }}</h3>
@@ -92,94 +95,5 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        const formUpdateQuantity = document.querySelectorAll('.cart-update-form');
-
-        formUpdateQuantity.forEach(function (form) {
-            const productId = form.dataset.id;
-            const input = form.querySelector('.quantity-input');
-            const btns = form.querySelectorAll('.btn-change-qty');
-
-            btns.forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    let quantity = parseInt(input.value) || 1;
-                    const delta = parseInt(btn.dataset.delta);
-                    quantity += delta;
-                    if (quantity < 1) quantity = 1;
-                    input.value = quantity;
-                    updateCart(productId, quantity);
-                });
-            });
-
-            input.addEventListener('change', function () {
-                let quantity = parseInt(input.value) || 1;
-                if (quantity < 1) quantity = 1;
-                input.value = quantity;
-                updateCart(productId, quantity);
-            });
-        });
-
-        function updateCart(productId, quantity) {
-            fetch('/cart/' + productId, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ quantity: quantity })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Request failed');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const totalElement = document.getElementById('cart-total-amount');
-                    const totalCart = document.getElementById('cart-total');
-
-                    if (data.total) {
-                        totalElement.textContent = new Intl.NumberFormat('vi-VN').format(data.total) + 'đ';
-                        totalCart.textContent = new Intl.NumberFormat('vi-VN').format(data.total) + 'đ';
-                    }
-                })
-                .catch(error => {
-                    console.error('Cập nhật thất bại', error);
-                });
-        }
-
-        const deleteButtons = document.querySelectorAll('.btn-delete-cart-item');
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const productId = button.dataset.id;
-
-                if (confirm('Bạn có chắc muốn xoá sản phẩm này?')) {
-                    fetch('/cart/' + productId, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Request failed');
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Đã xoá thành công', data);
-                            button.closest('.cart-item').remove();
-                            document.querySelector('#cart-count').textContent = data.cartCount;
-                            const remainingItems = document.querySelectorAll('.cart-item');
-                            if (remainingItems.length === 0) {
-                                location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Lỗi khi xoá:', error);
-                        });
-                }
-            });
-        });
-    </script>
+    @vite(['resources/assets/js/cart.js'])
 @endpush

@@ -40,8 +40,8 @@ class CartController extends Controller
         $result =$this->cartItemService->addToCart($dto);
 
         return ApiResponse::success(
-            $result['message'],
-            ['cartCount' => $result['cartCount']],
+            'Sản phẩm đã được thêm vào giỏ hàng.',
+            $result,
             null,
             200
         )->toResponse();
@@ -70,7 +70,12 @@ class CartController extends Controller
     {
         $quantity = (int) $request->input('quantity');
         $result = $this->cartItemService->updateCartQuantity($id, $quantity);
-        return response()->json($result);
+        return ApiResponse::success(
+            'Cập nhật giỏ hàng thành công.',
+            $result,
+            null,
+            200
+        )->toResponse();
     }
 
     /**
@@ -79,7 +84,12 @@ class CartController extends Controller
     public function destroy(string $id)
     {
         $result = $this->cartItemService->deleteCart($id);
-        return response()->json($result);
+        return ApiResponse::success(
+            'Đã xoá sản phẩm',
+            $result,
+            null,
+            200
+        )->toResponse();
     }
 
 }

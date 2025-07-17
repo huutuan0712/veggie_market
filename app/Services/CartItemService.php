@@ -84,10 +84,10 @@ class CartItemService extends BaseService
         return compact('cartItems', 'total');
     }
 
-    public function addToCart(array $data): array
+    public function addToCart($data): array
     {
-        $productId = $data['product_id'];
-        $quantity = $data['quantity'];
+        $productId = $data->product_id;
+        $quantity = $data->quantity;
 
         $user = auth()->user();
 
@@ -96,11 +96,10 @@ class CartItemService extends BaseService
             $cart[$productId] = ($cart[$productId] ?? 0) + $quantity;
             session()->put('cart', $cart);
 
-            $totalCount = collect($cart)->sum();
+            $totalCount = collect($cart)->count();
 
             return [
                 'cartCount' => $totalCount,
-                'message' => 'Sản phẩm đã được thêm vào giỏ hàng.',
             ];
         }
 
@@ -137,11 +136,10 @@ class CartItemService extends BaseService
             ]);
         }
 
-        $totalCount = $this->model->where('user_id', $user->id)->sum('quantity');
+        $totalCount = $this->model->where('user_id', $user->id)->count();
 
         return [
             'cartCount' => $totalCount,
-            'message' => 'Sản phẩm đã được thêm vào giỏ hàng.',
         ];
     }
 
@@ -182,7 +180,6 @@ class CartItemService extends BaseService
         }
 
         return [
-            'message' => 'Cập nhật giỏ hàng thành công.',
             'quantity' => $quantity,
             'total' => number_format($total),
         ];
@@ -196,15 +193,26 @@ class CartItemService extends BaseService
         {
             $this->model->where('user_id', $user->id)->where('product_id',$productId)->delete();
             $cartCount = $this->model->where('user_id', $user->id)->count();
+
+            $cartItems = $this->model->where('user_id', $user->id)->get();
+            $total = $cartItems->sum(fn ($item) => $item->product?->price * $item->quantity);
         } else {
             $cart = session()->get('cart', []);
             unset($cart[$productId]);
             session()->put('cart', $cart);
+
             $cartCount = count($cart);
+            $total = 0;
+
+            foreach ($cart as $item) {
+                $total += $item['price'] * $item['quantity'];
+            }
         }
+
         return [
-            'message' => 'Đã xoá sản phẩm',
             'cartCount' => $cartCount,
+            'total' => number_format($total)
         ];
     }
+
 }

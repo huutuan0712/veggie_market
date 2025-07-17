@@ -2,7 +2,6 @@
 
 namespace App\DTOs\Cart;
 
-use App\Models\CartItem;
 use App\DTOs\Product\Product as ProductDTO;
 
 class CartItem
@@ -13,7 +12,7 @@ class CartItem
     public ?int $quantity = null;
     public ?ProductDTO $product = null;
 
-    public static function fromModel(CartItem $cartItem): self
+    public static function fromModel(App\Models\CartItem $cartItem): self
     {
         $dto = new self;
         $dto->id = $cartItem->id;
