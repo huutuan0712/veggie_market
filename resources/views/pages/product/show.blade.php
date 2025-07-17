@@ -2,10 +2,9 @@
 
 @section('content')
     @php
-        $activeTab = request('tab', 'description');
         $tabs = [
             ['id' => 'description', 'label' => 'Mô tả'],
-            ['id' => 'reviews', 'label' => 'Đánh giá (' . 0 . ')'],
+            ['id' => 'reviews', 'label' => 'Đánh giá'],
         ];
     @endphp
 
@@ -168,7 +167,7 @@
             </div>
 
             <!-- Tabs Content -->
-            <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
+            <div class="bg-white rounded-3xl shadow-lg">
                 {{-- Tabs Content --}}
                 <div class="p-8">
                     @foreach ($tabs as $tab)
@@ -197,93 +196,150 @@
                                 <div>
                                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                                         <div class="bg-gray-50 p-6 rounded-2xl text-center">
-                                            <div class="text-4xl font-bold text-gray-900 mb-2">
-                                                {{ number_format($averageRating, 1) }}
+                                            <div class="text-center mb-6">
+                                                <div id="average-rating" class="text-4xl font-bold text-gray-900 mb-2">0.0</div>
+                                                <div id="average-stars" class="flex items-center justify-center space-x-1 mb-2"></div>
+                                                <div id="rating-count" class="text-gray-600">(0) đánh giá</div>
                                             </div>
-                                            <div class="flex items-center justify-center space-x-1 mb-2">
-                                                @for ($i = 0; $i < 5; $i++)
-                                                    <svg class="h-5 w-5 {{ $i < floor($averageRating) ? 'text-yellow-400 fill-current' : 'text-gray-300' }}"
-                                                         fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.284 3.943h4.14c.969 0 1.371 1.24.588 1.81l-3.356 2.44 1.285 3.943c.3.921-.755 1.688-1.539 1.118L10 13.348l-3.356 2.44c-.784.57-1.838-.197-1.539-1.118l1.285-3.943-3.356-2.44c-.783-.57-.38-1.81.588-1.81h4.14l1.284-3.943z" />
-                                                    </svg>
-                                                @endfor
-                                            </div>
-                                            <div class="text-gray-600">{{ count($reviews) }} đánh giá</div>
 
-                                            <div class="space-y-2 mt-4">
-                                                @foreach ($ratingDistribution as $item)
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-sm text-gray-600 w-8">{{ $item['rating'] }}★</span>
-                                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
-                                                            <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ $item['percentage'] }}%"></div>
-                                                        </div>
-                                                        <span class="text-sm text-gray-600 w-8">{{ $item['count'] }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                            <div id="rating-distribution" class="space-y-2 mt-4"></div>
                                         </div>
 
                                         <div class="lg:col-span-2">
-                                            <div class="bg-orange-50 p-6 rounded-2xl mb-6">
-                                                <h4 class="font-semibold text-gray-900 mb-3">Viết đánh giá</h4>
-                                                <p class="text-gray-600 mb-4">Chia sẻ trải nghiệm của bạn về sản phẩm này</p>
-                                                <a href="#"
-                                                   class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300">
+                                            <div class="bg-orange-50 p-6 rounded-2xl mb-6 shadow-md">
+                                                <h4 class="text-xl font-semibold text-gray-900 mb-2">Viết đánh giá</h4>
+                                                <p class="text-gray-600 mb-4">Chia sẻ trải nghiệm thực tế của bạn về sản phẩm này để giúp người khác.</p>
+                                                <button
+                                                    class="btn bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300"
+                                                    onclick="document.getElementById('review_modal').showModal()">
                                                     Viết đánh giá
-                                                </a>
+                                                </button>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="space-y-6">
-                                        <h4 class="text-lg font-semibold text-gray-900">Đánh giá từ khách hàng</h4>
-                                        @foreach ($reviews as $review)
-                                            <div class="border border-gray-200 rounded-2xl p-6">
-                                                <div class="flex items-start space-x-4">
-                                                    <img src="{{ $review['userAvatar'] }}" alt="{{ $review['userName'] }}"
-                                                         class="w-12 h-12 rounded-full object-cover">
-                                                    <div class="flex-1">
-                                                        <div class="flex items-center justify-between mb-2">
-                                                            <div>
-                                                                <h5 class="font-semibold text-gray-900">{{ $review['userName'] }}</h5>
-                                                                <div class="flex items-center space-x-2">
-                                                                    <div class="flex items-center space-x-1">
-                                                                        @for ($i = 0; $i < 5; $i++)
-                                                                            <svg class="h-4 w-4 {{ $i < $review['rating'] ? 'text-yellow-400 fill-current' : 'text-gray-300' }}"
-                                                                                 fill="currentColor" viewBox="0 0 20 20">
-                                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.284 3.943h4.14c.969 0 1.371 1.24.588 1.81l-3.356 2.44 1.285 3.943c.3.921-.755 1.688-1.539 1.118L10 13.348l-3.356 2.44c-.784.57-1.838-.197-1.539-1.118l1.285-3.943-3.356-2.44c-.783-.57-.38-1.81.588-1.81h4.14l1.284-3.943z" />
-                                                                            </svg>
-                                                                        @endfor
-                                                                    </div>
-                                                                    <span class="text-gray-500 text-sm">{{ $review['date'] }}</span>
+                                            <!-- Modal -->
+                                            <dialog id="review_modal" class="modal">
+                                                <div class="modal-box max-w-2xl w-full rounded-xl">
+                                                    <div class="flex items-center justify-between mb-4">
+                                                        <h3 class="text-2xl font-bold text-gray-800">Viết đánh giá</h3>
+                                                        <form method="dialog">
+                                                            <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                                                        </form>
+                                                    </div>
+
+                                                    <form id="ratingForm" method="POST" class="space-y-6">
+                                                        <input type="hidden" name="product_id" value="{{$product->id}}">
+                                                    <!-- Rating -->
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn</label>
+                                                            <div class="flex space-x-1">
+                                                                <div class="rating rating-sm">
+                                                                    @for ($i = 1; $i <= 5; $i++)
+                                                                        <input type="radio"
+                                                                               name="rating"
+                                                                               value="{{ $i }}"
+                                                                               class="mask mask-star-2 bg-orange-400"
+                                                                               required
+                                                                        >
+                                                                    @endfor
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <p class="text-gray-600 mb-4">{{ $review['comment'] }}</p>
 
-                                                        @if (!empty($review['images']))
-                                                            <div class="flex space-x-2 mb-4">
-                                                                @foreach ($review['images'] as $image)
-                                                                    <img src="{{ $image }}" alt="Ảnh đánh giá"
-                                                                         class="w-16 h-16 object-cover rounded-lg">
-                                                                @endforeach
-                                                            </div>
-                                                        @endif
+                                                        <!-- Comment -->
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét</label>
+                                                            <textarea name="comment" rows="4" required
+                                                                      class="textarea textarea-bordered w-full resize-none"
+                                                                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."></textarea>
+                                                        </div>
 
-                                                            <div class="flex items-center space-x-4">
-                                                            <button class="flex items-center space-x-1 text-gray-500 hover:text-green-600 transition-colors">
-                                                                <x-heroicon-o-hand-thumb-up class="h-4 w-4" />
-                                                                <span class="text-sm">Thích ({{ $review['helpful'] }})</span>
+                                                        <!-- Footer buttons -->
+                                                        <div class="flex justify-end space-x-3 pt-4 mt-4">
+                                                            <button type="submit" class="btn bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300">
+                                                                Gửi đánh giá
                                                             </button>
-                                                            <button class="flex items-center space-x-1 text-gray-500 hover:text-red-600 transition-colors">
-                                                                <x-heroicon-o-hand-thumb-down class="h-4 w-4" />
-                                                                <span class="text-sm">Không thích </span>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <form method="dialog" class="modal-backdrop">
+                                                    <button>close</button>
+                                                </form>
+                                            </dialog>
+
+                                            <dialog id="editRatingModal" class="modal">
+                                                <div class="modal-box max-w-2xl w-full rounded-xl">
+                                                    <div class="flex items-center justify-between mb-4">
+                                                        <h3 class="text-2xl font-bold text-gray-800">Chỉnh sửa đánh giá</h3>
+                                                        <form method="dialog">
+                                                            <button class="btn btn-sm btn-circle btn-ghost" id="cancelEditBtn">✕</button>
+                                                        </form>
+                                                    </div>
+
+                                                    <div id="editRatingForm" class="space-y-6">
+                                                        <input type="hidden" name="rating_id" id="editRatingId">
+                                                        <input type="hidden" name="product_id" id="editProductId" value="{{ $product->id }}">
+
+                                                        <!-- Rating -->
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn</label>
+                                                            <div class="flex space-x-1">
+                                                                <div class="rating rating-sm" id="editStars">
+                                                                    @for ($i = 1; $i <= 5; $i++)
+                                                                        <input type="radio"
+                                                                               name="rating"
+                                                                               value="{{ $i }}"
+                                                                               class="mask mask-star-2 bg-orange-400"
+                                                                               required
+                                                                        >
+                                                                    @endfor
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Comment -->
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét</label>
+                                                            <textarea name="comment" id="editComment" rows="4" required
+                                                                      class="textarea textarea-bordered w-full resize-none"
+                                                                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."></textarea>
+                                                        </div>
+
+                                                        <!-- Footer -->
+                                                        <div class="flex justify-end space-x-3 pt-4 mt-4">
+                                                            <button  id="submitEditBtn" class="btn bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300">
+                                                                Cập nhật đánh giá
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        @endforeach
+                                                <form method="dialog" class="modal-backdrop">
+                                                    <button>close</button>
+                                                </form>
+                                            </dialog>
+
+                                            <dialog id="deleteRatingModal" class="modal">
+                                                <div class="modal-box rounded-xl max-w-md text-center">
+                                                    <h3 class="font-bold text-lg text-gray-800 mb-4">Xác nhận xoá đánh giá</h3>
+                                                    <p class="text-sm text-gray-600 mb-6">Bạn có chắc chắn muốn xoá đánh giá này không?</p>
+
+                                                    <input type="hidden" id="deleteRatingId">
+
+                                                    <div class="flex justify-center space-x-4">
+                                                        <button id="confirmDeleteBtn" class="btn bg-red-600 text-white hover:bg-red-700">Xoá</button>
+                                                        <button id="cancelDeleteBtn" class="btn btn-ghost">Huỷ</button>
+                                                    </div>
+                                                </div>
+                                                <form method="dialog" class="modal-backdrop">
+                                                    <button>close</button>
+                                                </form>
+                                            </dialog>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="space-y-6">
+                                        <h4 class="text-lg font-semibold text-gray-900">Đánh giá từ khách hàng</h4>
+                                        <div id="reviewsContainer" class="space-y-4"></div>
                                     </div>
                                 </div>
                             @endif
@@ -295,92 +351,5 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const decreaseBtn = document.getElementById('decreaseQty');
-            const increaseBtn = document.getElementById('increaseQty');
-            const quantityInput = document.getElementById('quantity');
-            const addToCartBtn = document.getElementById('addToCartBtn');
-
-            decreaseBtn?.addEventListener('click', function () {
-                let qty = parseInt(quantityInput.value);
-                if (qty > 1) {
-                    quantityInput.value = qty - 1;
-                }
-            });
-
-            increaseBtn?.addEventListener('click', function () {
-                let qty = parseInt(quantityInput.value);
-                quantityInput.value = qty + 1;
-            });
-
-            addToCartBtn?.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                const productId = this.dataset.productId;
-                const quantity = parseInt(quantityInput.value);
-
-                fetch("{{ route('cart.store') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const cartCountEl = document.getElementById('cart-count');
-                            if (cartCountEl && data.data.cartCount !== undefined) {
-                                cartCountEl.textContent = data.data.cartCount;
-                            }
-                        } else {
-                            alert("Lỗi khi thêm sản phẩm");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Lỗi:", error);
-                        alert("Đã xảy ra lỗi.");
-                    });
-            });
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeClass = 'border-orange-500 text-orange-600';
-            const inactiveClass = 'border-transparent text-gray-500 hover:text-gray-700';
-
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetTab = button.getAttribute('data-tab');
-
-                    // Xóa active cũ
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove(...activeClass.split(' '));
-                        btn.classList.add(...inactiveClass.split(' '));
-                    });
-
-                    // Ẩn hết nội dung cũ
-                    tabPanes.forEach(pane => {
-                        pane.classList.add('hidden');
-                    });
-
-                    // Active tab mới
-                    button.classList.remove(...inactiveClass.split(' '));
-                    button.classList.add(...activeClass.split(' '));
-
-                    // Hiện nội dung tab mới
-                    const targetPane = document.querySelector(`.tab-pane[data-content="${targetTab}"]`);
-                    if (targetPane) {
-                        targetPane.classList.remove('hidden');
-                    }
-                });
-            });
-        });
-    </script>
+    @vite(['resources/assets/js/product-detail.js'])
 @endpush

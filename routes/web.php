@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -44,6 +45,7 @@ Route::resource('products', \App\Http\Controllers\ProductController::class);
 Route::resource('cart', \App\Http\Controllers\CartController::class);
 Route::resource('checkout', \App\Http\Controllers\CheckOutController::class);
 Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+
 Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
@@ -58,6 +60,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');
     Route::put('/account', [AuthController::class, 'updateAccount'])->name('account.update');
     Route::post('/account/update-password', [AuthController::class, 'updatePassword'])->name('account.password.update');
+
+    Route::get('/ratings/{id}', [RatingController::class, 'getRatings'])->name('ratings.index');
+    Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
+    Route::post('/ratings/reply', [RatingController::class, 'reply'])->name('ratings.reply');
+    Route::put('/ratings/{id}', [RatingController::class, 'update'])->name('ratings.update');
+    Route::delete('/ratings/{id}', [RatingController::class, 'destroy'])->name('ratings.destroy');
+
 });
 
 Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
