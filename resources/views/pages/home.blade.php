@@ -198,39 +198,5 @@
 
 @endsection
 @push('scripts')
-    <script>
-        const addToCartButtons = document.querySelectorAll('.btn-add-to-cart');
-
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const productId = button.dataset.id;
-
-                fetch('/cart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1
-                    })
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Request failed');
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Đã thêm vào giỏ hàng', data);
-                        const cartCountEl = document.getElementById('cart-count');
-                        if (cartCountEl && data.data.cartCount !== undefined) {
-                            cartCountEl.textContent = data.data.cartCount;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Lỗi khi thêm vào giỏ hàng:', error);
-                    });
-            });
-        });
-    </script>
+    @vite(['resources/assets/js/home.js'])
 @endpush

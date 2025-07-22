@@ -335,7 +335,8 @@
                                                 </a>
                                                 <button
                                                     type="button"
-                                                    onclick="confirmDelete({{ $product->id }})"
+                                                    data-product-btn
+                                                    data-product-id="{{ $product->id }}"
                                                     class="text-red-600 hover:text-red-700 transition-colors cursor-pointer"
                                                 >
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -354,15 +355,15 @@
                             </table>
 
                             <!-- Modal xóa -->
-                            <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+                            <div id="deleteProductModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
                             <div class="bg-white rounded-xl p-6 w-full max-w-sm text-center shadow-xl">
                                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Xác nhận xóa?</h3>
                                     <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa sản phẩm này?</p>
-                                    <form id="deleteForm" method="POST" action="">
+                                    <form id="deleteProductForm" method="POST" action="">
                                         @csrf
                                         @method('DELETE')
                                         <div class="flex justify-center space-x-3">
-                                            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy</button>
+                                            <button type="button" id="btn-close-product" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy</button>
                                             <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Xóa</button>
                                         </div>
                                     </form>
@@ -446,7 +447,8 @@
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </a>
                                                 <button type="button"
-                                                        onclick="confirmCategoryDelete({{ $category->id }})"
+                                                        data-category-btn
+                                                        data-category-id="{{ $category->id }}"
                                                         class="text-red-600 hover:text-red-700 transition-colors">
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor"
                                                          viewBox="0 0 24 24" stroke-width="1.5">
@@ -479,7 +481,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <div class="flex justify-center space-x-3">
-                                        <button type="button" onclick="closeCategoryModal()"
+                                        <button type="button" id="btn-close-category"
                                                 class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy
                                         </button>
                                         <button type="submit"
@@ -597,36 +599,5 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        function confirmDelete(productId) {
-            const modal = document.getElementById('deleteModal');
-            const form = document.getElementById('deleteForm');
-
-            form.action = `/products/${productId}`;
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('deleteModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function setCategoryAndSubmit(slug) {
-            document.getElementById('categoryInput').value = slug;
-            document.getElementById('filterForm').submit();
-        }
-
-        function confirmCategoryDelete(id) {
-            const form = document.getElementById('deleteCategoryForm');
-            form.action = '/categories/' + id;
-            document.getElementById('deleteCategoryModal').classList.remove('hidden');
-        }
-
-        function closeCategoryModal() {
-            document.getElementById('deleteCategoryModal').classList.add('hidden');
-        }
-    </script>
+    @vite(['resources/assets/js/dashboard.js'])
 @endpush

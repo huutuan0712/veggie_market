@@ -74,7 +74,8 @@
                             @endunless
                             <button
                                 id="favorite-btn-{{ $product->id }}"
-                                onclick="toggleFavorite({{ $product->id }})"
+                                data-favorite-btn
+                                data-product-id="{{ $product->id }}"
                                 class="absolute top-4 right-4 p-2 rounded-full transition-all duration-300
                                 {{ in_array($product->id, $favoriteIds ?? []) ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500' }}"
                                 title="Yêu thích"
@@ -120,37 +121,7 @@
         </div>
     </div>
 @endsection
-<script>
-    function toggleFavorite(productId) {
-        fetch('{{ route('wishlist.toggle') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ product_id: productId })
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-
-                const badge = document.getElementById('farovites-count');
-                if (badge) {
-                    badge.textContent = data.count;
-                }
-
-                const btn = document.getElementById(`favorite-btn-${productId}`);
-                if (btn) {
-                    btn.classList.toggle('bg-red-500');
-                    btn.classList.toggle('text-white');
-                    btn.classList.toggle('hover:bg-red-600');
-                    btn.classList.toggle('bg-white/90');
-                    btn.classList.toggle('text-gray-600');
-                    btn.classList.toggle('hover:bg-white');
-                    btn.classList.toggle('hover:text-red-500');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-</script>
+@push('scripts')
+    @vite(['resources/assets/js/product.js'])
+@endpush
 

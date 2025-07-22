@@ -131,17 +131,6 @@
 </header>
 
 @push('scripts')
-    <script>
-        const toggle = document.getElementById('mobileMenuToggle');
-        const menu = document.getElementById('mobileNav');
-        const menuIcon = document.getElementById('menuIcon');
-        const closeIcon = document.getElementById('closeIcon');
-
-        toggle?.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
-            menuIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        });
-    </script>
+    @vite(['resources/assets/js/header.js'])
 @endpush
 
