@@ -10,3 +10,16 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 @plugin "daisyui";
+
+
+.thumb-swiper .swiper-slide img {
+    @apply border-gray-200;
+}
+
+.thumb-swiper .swiper-slide-thumb-active img {
+    @apply border-orange-500;
+}
+.main-swiper .swiper-button-next,
+.main-swiper .swiper-button-prev {
+    @apply text-orange-500;
+}

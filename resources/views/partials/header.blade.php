@@ -14,12 +14,31 @@
 
             {{-- Desktop Navigation --}}
             <nav class="hidden md:flex items-center space-x-8">
-                <a href="{{ route('home') }}" class="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                    Trang chủ
-                </a>
-                <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                    Trái cây
-                </a>
+                @php
+                    $navigation = [
+                        [
+                            'label' => 'Trang chủ',
+                            'url' => route('home')
+                        ],
+                        [
+                            'label' => 'Sản phẩm',
+                            'url' => route('products.index')
+                        ],
+                        [
+                            'label' => 'Blog',
+                            'url' => '#'
+                        ],
+                        [
+                            'label' => 'Liên hệ',
+                            'url' => '#'
+                        ]
+                    ];
+                @endphp
+                @foreach($navigation as $item)
+                    <a href="{{$item['url']}}" class="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+                        {{$item['label']}}
+                    </a>
+                @endforeach
             </nav>
 
             {{-- Actions --}}
@@ -113,18 +132,14 @@
         {{-- Mobile Navigation --}}
         <div id="mobileNav" class="hidden md:hidden py-4 border-t border-orange-100">
             <nav class="flex flex-col space-y-2">
-                <a
-                    href="{{ route('home') }}"
-                    class="px-4 py-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                >
-                    Trang chủ
-                </a>
-                <a
-                    href="#"
-                    class="px-4 py-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                >
-                    Trái cây
-                </a>
+                @foreach ($navigation as $item)
+                    <a
+                        href="{{ $item['url'] }}"
+                        class="px-4 py-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                    >
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
             </nav>
         </div>
     </div>

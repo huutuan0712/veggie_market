@@ -21,38 +21,62 @@
                 {{-- Product Image --}}
                 <div class="space-y-4">
                     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-50 to-green-50">
-                        @php
-                            $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+                    @php
+                        $inStock = $product->status === \App\Enums\ProductStatus::IN_STOCK;
+                        $images = is_array($product->images) ? $product->images : [];
+                    @endphp
 
-                            $image = is_array($product->images) && count($product->images) > 0
-                                                ? asset('storage/' . $product->images[0]['path'])
-                                                : 'https://via.placeholder.com/300x200?text=No+Image';
-                        @endphp
+                        <div class="swiper main-swiper w-full h-96 lg:h-[500px] rounded-3xl">
+                            <div class="swiper-wrapper">
+                                @forelse($images as $img)
+                                    <div class="swiper-slide">
+                                        <img
+                                            src="{{ asset('storage/' . $img['path']) }}"
+                                            alt="{{ $product->name }}"
+                                            class="w-full h-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                @empty
+                                    <div class="swiper-slide">
+                                        <img
+                                            src="https://via.placeholder.com/300x200?text=No+Image"
+                                            alt="No Image"
+                                            class="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                @endforelse
+                            </div>
 
-                        <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full h-96 lg:h-[500px] object-cover" />
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
 
+                        <!-- Label giảm giá -->
                         @if($product->original_price)
-                            <div
-                                class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
-                                Giảm {{ round((($product->original_price - $product->price) / $product->original_price) * 100) }}
-                                %
+                            <div class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-semibold z-10">
+                                Giảm {{ round((($product->original_price - $product->price) / $product->original_price) * 100) }}%
                             </div>
                         @endif
                     </div>
-                    <div class="grid grid-cols-4 gap-4">
-                        @foreach($product->images as $index => $image)
-                            <button
-                                type="button"
-                                class="relative overflow-hidden rounded-xl border-2 border-gray-200 hover:border-orange-300 transition-all"
-                            >
-                                <img
-                                    src="{{ asset('storage/' . $image['path']) }}"
-                                    alt="{{ $product->name }} {{ $index + 1 }}"
-                                    class="w-full h-20 object-cover"
-                                />
-                            </button>
-                        @endforeach
-                    </div>
+
+                    <!-- Thumbnails -->
+                    @if(count($images) > 1)
+                        <div class="swiper thumb-swiper">
+                            <div class="swiper-wrapper">
+                                @foreach($images as $img)
+                                    <div class="swiper-slide cursor-pointer">
+                                        <img
+                                            src="{{ asset('storage/' . $img['path']) }}"
+                                            alt="{{ $product->name }}"
+                                            class="w-24 h-20 object-cover rounded-xl border-2 border-gray-200 hover:border-orange-300 transition"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Product Info --}}
@@ -155,7 +179,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tabs flex space-x-8 px-8">
+            <div class="tabs flex pt-6 space-x-8 px-8">
                 @foreach ($tabs as $tab)
                     <button
                         class="tab-btn py-4 px-2 border-b-2 font-medium text-sm transition-colors
@@ -351,5 +375,8 @@
     </div>
 @endsection
 @push('scripts')
-    @vite(['resources/assets/js/product-detail.js'])
+    @vite([
+        'resources/assets/js/product-detail.js',
+        'resources/assets/js/product-gallery.js'
+    ])
 @endpush

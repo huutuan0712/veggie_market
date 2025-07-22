@@ -129,58 +129,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach ($featuredProducts as $product)
-                    @php
-                        $image = $product['images'] && count($product['images']) > 0
-                                                   ? asset('storage/' . $product->images[0]['path'])
-                                                   : 'https://via.placeholder.com/300x200?text=No+Image';
-
-                    @endphp
-                    <div
-                        class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-                        <div class="relative overflow-hidden">
-                            <a href="{{ route('products.show', ['product' => $product['id']]) }}">
-                                <img
-                                    src="{{ $image }}"
-                                    alt="{{ $product['name'] }}"
-                                    class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                                />
-                                @if ($product['originalPrice'])
-                                    <div
-                                        class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        Giảm {{ round((($product['originalPrice'] - $product['price']) / $product['originalPrice']) * 100) }}
-                                        %
-                                    </div>
-                                @endif
-                            </a>
-                        </div>
-
-                        <div class="p-6">
-                            <a href="{{ route('products.show', ['product' => $product['id']]) }}">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $product['name'] }}</h3>
-                            </a>
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product['description'] }}</p>
-
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-2">
-                                <span class="text-2xl font-bold text-orange-600">
-                                    {{ number_format($product['price'], 0, ',', '.') }}đ
-                                </span>
-                                    @if ($product['originalPrice'])
-                                        <span class="text-gray-400 line-through text-sm">
-                                        {{ number_format($product['originalPrice'], 0, ',', '.') }}đ
-                                    </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <button
-                                class="btn-add-to-cart w-full bg-gradient-to-r from-orange-500 cursor-pointer to-red-500 text-white py-3 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center justify-center space-x-2"
-                                data-id="{{ $product->id }}"
-                            >
-                                <span>Mua ngay</span>
-                            </button>
-                        </div>
-                    </div>
+                    <x-product-card :product="$product" />
                 @endforeach
             </div>
 
@@ -198,5 +147,8 @@
 
 @endsection
 @push('scripts')
-    @vite(['resources/assets/js/home.js'])
+    @vite([
+        'resources/assets/js/home.js',
+        'resources/assets/js/product.js'
+    ])
 @endpush
