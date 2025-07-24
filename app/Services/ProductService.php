@@ -166,13 +166,16 @@ class ProductService extends BaseService
         }
     }
 
-    public function deleteProductImages(Product $product): void
+   public function deleteProductImages(int $productId, int $imageId): void
     {
-        foreach ($product->images as $image) {
+        $product = $this->model->with('images')->findOrFail($productId);
+
+        $image = $product->images->firstWhere('id', $imageId);
+
+        if ($image) {
             if ($image->path && Storage::disk('public')->exists($image->path)) {
                 Storage::disk('public')->delete($image->path);
             }
-
             $image->delete();
         }
     }

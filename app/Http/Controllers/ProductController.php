@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTOs\Product\Product as ProductDTO;
 use App\Http\Requests\Product\StoreProductFormRequest;
 use App\Http\Requests\Product\UpdateProductFormRequest;
+use App\Http\Responses\ApiResponse;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -114,4 +115,17 @@ class ProductController extends Controller
         $this->productService->delete($id);
         return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Xóa sản phẩm thành công!');
     }
+
+    public function destroyProductImage($id, $imageId)
+    {
+        $this->productService->deleteProductImages($id, $imageId);
+
+        return ApiResponse::success(
+            'Xóa hình ảnh thành công.',
+            null,
+            null,
+            200
+        )->toResponse();
+    }
+
 }

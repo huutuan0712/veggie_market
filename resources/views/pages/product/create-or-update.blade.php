@@ -113,7 +113,7 @@
                     {{-- Sidebar --}}
                     <div class="lg:col-span-1 space-y-6">
                         {{-- Image Upload --}}
-                        <x-form.image-upload name="images" label="Hình ảnh sản phẩm" :value="$product->images ?? null" />
+                        <x-form.image-upload name="images" label="Hình ảnh sản phẩm" :value="$product->images ?? null"  productId="{{$product->id}}"/>
 
                         {{-- Actions --}}
                         <div class="bg-white rounded-3xl shadow-lg p-6">

@@ -12,7 +12,9 @@
         {{ $attributes->merge(['class' => 'w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white']) }}
     >
         @foreach ($options as $option)
-            <option value="{{ $option->id }}" {{ $option == old($name, $value) ? 'selected' : '' }}>{{ $option->name }}</option>
+            <option value="{{ $option['id'] }}" {{ (string) $option['id'] === (string) old($name, $value) ? 'selected' : '' }}>
+                {{ $option['name'] }}
+            </option>
         @endforeach
     </select>
 </div>

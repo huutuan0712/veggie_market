@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -45,6 +46,7 @@ Route::resource('products', \App\Http\Controllers\ProductController::class);
 Route::resource('cart', \App\Http\Controllers\CartController::class);
 Route::resource('checkout', \App\Http\Controllers\CheckOutController::class);
 Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+Route::delete('/products/{id}/images/{imageId}', [ProductController::class, 'destroyProductImage']);
 
 Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
