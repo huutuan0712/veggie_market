@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="min-h-screen py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
             @if(empty($products))
                 <div class="text-center py-20">
                     <x-heroicon-o-heart class="h-24 w-24 text-gray-300 mx-auto mb-6" />
@@ -31,6 +31,15 @@
                     </a>
                 </div>
                 @else
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">Danh sách yêu thích</h1>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
+                        <x-heroicon-o-arrow-left class="w-6 h-6 text-gray-500" />
+                        <span>Tiếp tục mua sắm</span>
+                    </a>
+                </div>
                 <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -48,11 +57,14 @@
                             @foreach ($products as $product)
                                 @php
                                     $inStock = $product['status'] === \App\Enums\ProductStatus::IN_STOCK;
+                                    $image = $product['image']
+                                        ? asset('storage/' . $product['image'])
+                                        : 'https://via.placeholder.com/300x200?text=No+Image';
                                 @endphp
                                 <tr class="border-b border-gray-100">
                                     <td class="py-4 px-6">
                                         <div class="flex items-center space-x-4">
-                                            <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="w-12 h-12 object-cover rounded-xl" />
+                                            <img src="{{ $image }}" alt="{{ $product['name'] }}" class="w-12 h-12 object-cover rounded-xl" />
                                             <div>
                                                 <div class="font-semibold text-gray-900">{{ $product['name'] }}</div>
                                             </div>
@@ -63,7 +75,7 @@
                                     </td>
                                     <td class="py-4 px-6">
                                         <div class="font-semibold text-gray-900">{{ number_format($product['price']) }}đ</div>
-                                        @if (!empty($product['originalPrice']))
+                                        @if (!empty($product['originalPrice']) && $product['originalPrice'] > 0)
                                             <div class="text-sm text-gray-400 line-through">
                                                 {{ number_format($product['originalPrice']) }}đ
                                             </div>
@@ -83,6 +95,12 @@
                                         <div class="flex items-center space-x-2">
                                             <button type="button" class="text-red-600 hover:text-red-700 transition-colors cursor-pointer">
                                                 <x-heroicon-o-trash class="w-5 h-5" />
+                                            </button>
+                                            <button
+                                                class="btn-add-to-cart w-full block text-center py-3 rounded-2xl font-semibold transition-all duration-300 cursor-pointer"
+                                                data-id="{{ $product['id'] }}"
+                                            >
+                                                <x-heroicon-o-shopping-cart class="h-6 w-6" />
                                             </button>
                                         </div>
                                     </td>
@@ -113,31 +131,7 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('change', function () {
-                const productId = this.dataset.productId;
-                const quantity = this.value;
-
-                fetch("{{ route('wishlist.updateQuantity') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data.message);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
-        });
-    </script>
+    @vite([
+        'resources/assets/js/home.js',
+    ])
 @endpush

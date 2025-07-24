@@ -4,13 +4,16 @@
     <div class="min-h-screen py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if(count($cartItems) === 0)
-                <div class="text-center py-20">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
-                    <p class="text-gray-600 mb-8">Hãy thêm một số trái cây tươi ngon vào giỏ hàng</p>
-                    <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 inline-flex items-center space-x-2">
-                        <span>Mua sắm ngay</span>
-                    </a>
-                </div>
+               <div class="flex items-center w-full justify-center">
+                   <div class="text-center py-20">
+                       <x-heroicon-o-shopping-bag  class="h-24 w-24 text-gray-300 mx-auto mb-6"/>
+                       <h2 class="text-3xl font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
+                       <p class="text-gray-600 mb-8">Hãy thêm một số trái cây tươi ngon vào giỏ hàng</p>
+                       <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 inline-flex items-center space-x-2">
+                           <span>Mua sắm ngay</span>
+                       </a>
+                   </div>
+               </div>
             @else
                 <div class="flex items-center justify-between mb-8">
                     <div>

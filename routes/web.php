@@ -55,16 +55,16 @@ Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.
 
 Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlists');
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-Route::post('/wishlists/update-quantity', [WishlistController::class, 'updateQuantity'])->name('wishlist.updateQuantity');
 
 Route::get('/contacts', [\App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
+
+Route::get('/ratings/{id}', [RatingController::class, 'getRatings'])->name('ratings.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');
     Route::put('/account', [AuthController::class, 'updateAccount'])->name('account.update');
     Route::post('/account/update-password', [AuthController::class, 'updatePassword'])->name('account.password.update');
 
-    Route::get('/ratings/{id}', [RatingController::class, 'getRatings'])->name('ratings.index');
     Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::post('/ratings/reply', [RatingController::class, 'reply'])->name('ratings.reply');
     Route::put('/ratings/{id}', [RatingController::class, 'update'])->name('ratings.update');

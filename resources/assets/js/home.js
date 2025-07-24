@@ -14,12 +14,14 @@ class HomeManager {
         this.addToCartButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const productId = button.dataset.id;
-                this.addToCart(e, productId)
+                const quantityInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`);
+                const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+                this.addToCart(e, productId, quantity)
             })
         })
     }
 
-    async addToCart(e, productId) {
+    async addToCart(e, productId, quantity) {
         e.preventDefault();
 
         try {
@@ -31,7 +33,7 @@ class HomeManager {
                 },
                 body: JSON.stringify({
                     product_id: productId,
-                    quantity: 1
+                    quantity: quantity
                 })
             });
 

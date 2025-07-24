@@ -85,12 +85,8 @@
                         <span class="text-orange-600 font-medium text-sm">{{ $product->category->name }}</span>
                         <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">{{ $product->name }}</h1>
                         <div class="flex items-center space-x-2 mb-4">
-                            <div class="flex items-center space-x-1">
-                                @for ($i = 0; $i < 5; $i++)
-                                    <x-heroicon-s-star class="h-5 w-5 text-yellow-400"/>
-                                @endfor
-                            </div>
-                            <span class="text-gray-600">(128 đánh giá)</span>
+                            <div id="average-stars" class="flex items-center space-x-1"></div>
+                            <span id="rating-count" class="text-gray-600">(0) đánh giá)</span>
                         </div>
                     </div>
 

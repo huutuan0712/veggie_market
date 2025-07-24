@@ -35,7 +35,7 @@ class WishlistService extends BaseService
 
     protected function getAuthenticatedWishlist($userId)
     {
-        return $this->model->with('product')
+        return $this->model->with('product.images')
         ->where('user_id', $userId)
             ->get()
             ->map(function ($item) {
@@ -43,7 +43,7 @@ class WishlistService extends BaseService
                     'id' => $item->product->id,
                     'name' => $item->product->name,
                     'category' => $item->product->category->name ?? 'Chưa rõ',
-                    'image' => $item->product->image_url,
+                    'image' => $item->product->images?->first()->path,
                     'price' => $item->product->price,
                     'originalPrice' => $item->product->original_price,
                     'status' => $item->product->status,
