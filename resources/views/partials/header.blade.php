@@ -30,7 +30,7 @@
                         ],
                         [
                             'label' => 'Liên hệ',
-                            'url' => '#'
+                            'url' => route('contacts.index')
                         ]
                     ];
                 @endphp
@@ -96,11 +96,19 @@
                                     Hồ sơ
                                 </a>
                             </li>
+                            @if(Auth::user()->isAdmin())
+                                <li>
+                                    <a href="{{ route('dashboard')}}"
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Quản lý
+                                    </a>
+                                </li>
+                            @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button
                                     type="submit"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-lg"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-lg cursor-pointer"
                                 >
                                     Đăng xuất
                                 </button>

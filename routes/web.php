@@ -57,6 +57,7 @@ Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlists'
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 Route::post('/wishlists/update-quantity', [WishlistController::class, 'updateQuantity'])->name('wishlist.updateQuantity');
 
+Route::get('/contacts', [\App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');
