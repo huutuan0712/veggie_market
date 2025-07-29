@@ -47,9 +47,6 @@
                             <a href="?tab=orders" class="block w-full px-4 py-3 rounded-xl text-left {{ request('tab') == 'orders' ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'text-gray-600 hover:bg-gray-50' }}">
                                 Đơn hàng
                             </a>
-                            <a href="?tab=favorites" class="block w-full px-4 py-3 rounded-xl text-left {{ request('tab') == 'favorites' ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'text-gray-600 hover:bg-gray-50' }}">
-                                Yêu thích
-                            </a>
                             <a href="?tab=security" class="block w-full px-4 py-3 rounded-xl text-left {{ request('tab') == 'security' ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'text-gray-600 hover:bg-gray-50' }}">
                                 Bảo mật
                             </a>
@@ -63,8 +60,6 @@
                         @include('pages.account.tabs.profile')
                     @elseif(request('tab') === 'orders')
                         @include('pages.account.tabs.orders')
-                    @elseif(request('tab') === 'favorites')
-                        @include('pages.account.tabs.favorites')
                     @elseif(request('tab') === 'security')
                         @include('pages.account.tabs.security')
                     @endif

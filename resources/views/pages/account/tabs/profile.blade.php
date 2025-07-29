@@ -11,8 +11,21 @@
             <span id="editLabel">Chỉnh sửa</span>
         </button>
     </div>
+    @if (session('status'))
+        <div class="text-green-600 mb-4">{{ session('status') }}</div>
+    @endif
 
+    @if ($errors->any())
+        <div class="text-red-600 mb-4">
+            <ul class="list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form method="POST" action="{{ route('account.update') }}">
+        @method('PUT')
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
