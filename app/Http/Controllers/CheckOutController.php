@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartItem;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Kjmtrue\VietnamZone\Models\Province;
 
 class CheckOutController extends Controller
 {
@@ -11,43 +15,22 @@ class CheckOutController extends Controller
      */
     public function index()
     {
-        // Fake cart items
-        $cartItems = collect([
-            (object)[
-                'id' => 1,
-                'name' => 'Xoài Hòa Lộc',
-                'image' => 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'price' => 50000,
-                'quantity' => 2,
-            ],
-            (object)[
-                'id' => 2,
-                'name' => 'Dâu tây Đà Lạt',
-                'image' => 'https://images.pexels.com/photos/1125328/pexels-photo-1125328.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'price' => 80000,
-                'quantity' => 1,
-            ],
-        ]);
+        $user_id = Auth::id();
+        $user = User::with('shippingAddress')->find($user_id);
+        $cartItems = CartItem::with('product.images')
+            ->where('user_id', $user_id)
+            ->get();
 
-        // Tính tổng tiền
-        $total = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->quantity * $item->product->price;
+        });
 
-        // Fake user info (có thể lấy từ Auth::user() nếu đã login)
-        $user = (object)[
-            'name' => 'Nguyễn Văn A',
-            'email' => 'vana@example.com',
-            'phone' => '0912345678',
-        ];
+        $shippingFee = 0; // Free shipping
+        $total = $subtotal + $shippingFee;
+        $discountAmount = 0;
+        $provinces = Province::get();
 
-        // Fake shipping address
-        $shipping = (object)[
-            'address' => '123 Đường Trái Cây',
-            'city' => 'Hồ Chí Minh',
-            'district' => 'Quận 1',
-            'ward' => 'Phường Bến Nghé',
-        ];
-        $currentStep = 1;
-        return view('pages.checkout.index', compact('cartItems', 'total', 'user', 'shipping', 'currentStep'));
+        return view('pages.checkout.index', compact('cartItems', 'subtotal', 'shippingFee', 'discountAmount', 'total', 'user', 'provinces'));
     }
 
     /**

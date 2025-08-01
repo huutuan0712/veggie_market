@@ -69,4 +69,9 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    public function shippingAddress()
+    {
+        return $this->hasOne(Address::class, 'user_id')->where('default', true);
+    }
 }

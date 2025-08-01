@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
@@ -59,6 +60,9 @@ Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wi
 Route::get('/contacts', [\App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
 
 Route::get('/ratings/{id}', [RatingController::class, 'getRatings'])->name('ratings.index');
+
+Route::get('/get-districts/{provinceId}', [LocationController::class, 'getDistricts']);
+Route::get('/get-wards/{districtId}', [LocationController::class, 'getWards']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AuthController::class, 'showAccount'])->name('account');

@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
-    protected $table = 'shipping_addresses';
+    protected $table = 'address';
     protected $fillable = ['user_id', 'full_name', 'phone', 'province', 'district', 'ward', 'address', 'default'];
 }
