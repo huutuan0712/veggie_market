@@ -28,7 +28,9 @@ class Order extends Model
         'shipping_ward',
         'payment_method',
         'paid_at',
-        'notes'
+        'notes',
+        'voucher_id',
+        'voucher_code'
     ];
 
     protected $casts = [
@@ -64,5 +66,15 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItems::class, 'order_id');
+    }
+
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class);
+    }
+
+    public function voucherUsage()
+    {
+        return $this->hasOne(VoucherUsage::class);
     }
 }

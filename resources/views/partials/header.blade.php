@@ -98,7 +98,7 @@
                             </li>
                             @if(Auth::user()->isAdmin())
                                 <li>
-                                    <a href="{{ route('dashboard')}}"
+                                    <a href="{{ route('admin.dashboard')}}"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         Quản lý
                                     </a>

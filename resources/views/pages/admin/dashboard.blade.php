@@ -33,6 +33,7 @@
                                 ['id' => 'categories', 'label' => 'Danh mục', 'icon' => 'funnel'],
                                 ['id' => 'orders', 'label' => 'Đơn hàng', 'icon' => 'shopping-cart'],
                                 ['id' => 'users', 'label' => 'Khách hàng', 'icon' => 'users'],
+                                ['id' => 'vouchers', 'label' => 'Giảm giá', 'icon' => 'gift'],
                             ];
 
                         @endphp
@@ -98,6 +99,10 @@
                                         <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                         <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
                                     </svg>
+                                    @break
+
+                                    @case('gift')
+                                        <x-heroicon-o-gift class="h-6 w-6" />
                                     @break
                                 @endswitch
 
@@ -593,6 +598,144 @@
                         </div>
                     </div>
                 </div>
+            @endif
+
+            @if($activeTab === 'vouchers')
+                        {{-- Header --}}
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 class="text-3xl lg:text-4xl font-bold text-gray-900">Quản lý Voucher</h1>
+                                <p class="text-gray-600 mt-2">Tạo và quản lý mã giảm giá cho cửa hàng</p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <a href="#" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold">Tạo Voucher</a>
+                            </div>
+                        </div>
+
+                        {{-- Success Message --}}
+                        @if(session('success'))
+                            <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-2xl mb-6">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        {{-- Stats Cards --}}
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <x-voucher.card title="Tổng voucher" :value="$vouchers->count()" icon="gift" color="blue" />
+                            <x-voucher.card title="Đang hoạt động" :value="$vouchers->where('is_active', true)->where('expires_at', '>=', now())->count()" icon="check-circle" color="green" />
+                            <x-voucher.card title="Đã sử dụng" :value="$vouchers->sum('used_count')" icon="users" color="orange" />
+                            <x-voucher.card title="Hết hạn" :value="$vouchers->where('expires_at', '<', now())->count()" icon="clock" color="red" />
+                        </div>
+
+                        {{-- Filter Form --}}
+                        <form method="GET" class="bg-white rounded-3xl shadow-lg p-6 mb-8">
+                            <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                                <div class="flex flex-col sm:flex-row gap-4 flex-1">
+                                    <div class="relative flex-1 max-w-md">
+                                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                                        </svg>
+                                        <input type="hidden" name="tab" value="{{ request('tab', $activeTab) }}">
+                                        <input
+                                            type="text"
+                                            name="search"
+                                            value="{{ request('search') }}"
+                                            placeholder="Tìm kiếm voucher..."
+                                            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+                                    <select name="status" class="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white">
+                                        <option value="all" {{ $status === 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
+                                        <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
+                                        <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Tạm dừng</option>
+                                        <option value="expired" {{ $status === 'expired' ? 'selected' : '' }}>Hết hạn</option>
+                                    </select>
+                                    <select name="type" class="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white">
+                                        <option value="all" {{ $type === 'all' ? 'selected' : '' }}>Tất cả loại</option>
+                                        <option value="percentage" {{ $type === 'percentage' ? 'selected' : '' }}>Phần trăm</option>
+                                        <option value="fixed" {{ $type === 'fixed' ? 'selected' : '' }}>Số tiền cố định</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+
+                        {{-- Voucher Table --}}
+                        <div class="bg-white rounded-3xl shadow-lg overflow-x-auto">
+                            <table class="table-auto w-full">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Voucher</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Loại & Giá trị</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Điều kiện</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Sử dụng</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Thời hạn</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Trạng thái</th>
+                                    <th class="text-left py-4 px-6 font-semibold text-gray-900">Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @forelse($vouchers as $voucher)
+                                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-mono font-bold">{{ $voucher->code }}</div>
+                                            <div class="text-sm text-gray-700">{{ $voucher->name }}</div>
+                                            <div class="text-xs text-gray-500">{{ Str::limit($voucher->description, 40) }}</div>
+                                            <span class="text-xs inline-block mt-1 px-2 py-1 rounded-full bg-{{ $voucher->is_public ? 'blue' : 'purple' }}-100 text-{{ $voucher->is_public ? 'blue' : 'purple' }}-700">
+                                                {{ $voucher->is_public ? 'Công khai' : 'Riêng tư' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm font-semibold">
+                                                @if($voucher->type === 'percentage')
+                                                    {{ $voucher->value }}%
+                                                    @if($voucher->max_discount_amount)
+                                                        <div class="text-xs text-gray-500">Tối đa {{ number_format($voucher->max_discount_amount) }}đ</div>
+                                                    @endif
+                                                @else
+                                                    {{ number_format($voucher->value) }}đ
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            Đơn tối thiểu: {{ number_format($voucher->min_order_amount) }}đ<br/>
+                                            Giới hạn/người: {{ $voucher->usage_limit_per_user }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            {{ $voucher->used_count }}/{{ $voucher->usage_limit ?? '∞' }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            {{ \Carbon\Carbon::parse($voucher->starts_at)->format('d/m/Y') }} -
+                                            {{ \Carbon\Carbon::parse($voucher->expires_at)->format('d/m/Y') }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                    <span class="inline-flex px-3 py-1 text-sm rounded-full {{ $voucher->expires_at < now() ? 'bg-red-100 text-red-700' : ($voucher->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700') }}">
+                                        {{ $voucher->expires_at < now() ? 'Hết hạn' : ($voucher->is_active ? 'Hoạt động' : 'Tạm dừng') }}
+                                    </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center space-x-1">
+                                                <form action="{{ route('admin.vouchers.toggle', $voucher) }}" method="POST" class="inline">
+                                                    @csrf @method('PATCH')
+                                                    <button class="text-sm text-orange-600 hover:underline flex items-center" title="Bật/tắt"><x-heroicon-o-eye class="w-5 h-5" /></button>
+                                                </form>
+                                                <a href="#" class="text-sm text-blue-600 hover:underline"><x-heroicon-o-pencil-square class="w-5 h-5" /></a>
+                                                <form action="{{ route('admin.vouchers.destroy', $voucher) }}" method="POST" class="inline">
+                                                    @csrf @method('DELETE')
+                                                    <button class="text-sm text-red-600 hover:underline flex items-center" onclick="return confirm('Xác nhận xóa?')">
+                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="7" class="text-center py-6 text-gray-500">Không tìm thấy voucher</td></tr>
+                                @endforelse
+                                </tbody>
+                            </table>
+                        </div>
             @endif
 
         </div>

@@ -37,7 +37,7 @@
                         class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-2xl font-semibold transition">
                     {{ isset($category) ? 'Cập nhật' : 'Tạo danh mục' }}
                 </button>
-                <a href="{{ route('dashboard', ['tab' => 'categories']) }}"
+                <a href="{{ route('admin.dashboard', ['tab' => 'categories']) }}"
                    class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-2xl font-semibold hover:bg-gray-100 text-center transition">
                     Quay lại
                 </a>

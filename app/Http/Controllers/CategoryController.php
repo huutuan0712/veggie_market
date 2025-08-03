@@ -38,7 +38,7 @@ class CategoryController extends Controller
         $dto = CategoryDTO::fromRequest($request->validated());
         $this->categoryService->createDTO($dto);
 
-        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Tạo danh mục thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'categories'])->with('success', 'Tạo danh mục thành công!');
     }
 
     /**
@@ -67,7 +67,7 @@ class CategoryController extends Controller
         $dto = CategoryDTO::fromRequest($request->validated());
         $this->categoryService->updateDTO($id, $dto);
 
-        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Cập nhật danh mục thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'categories'])->with('success', 'Cập nhật danh mục thành công!');
     }
 
     /**
@@ -76,6 +76,6 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $this->categoryService->delete($id);
-        return redirect()->route('dashboard', ['tab' => 'categories'])->with('success', 'Xóa danh mục thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'categories'])->with('success', 'Xóa danh mục thành công!');
     }
 }

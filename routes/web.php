@@ -6,6 +6,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -76,6 +77,12 @@ Route::middleware('auth')->group(function () {
 
 });
 
-Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
+
+    Route::post('/vouchers', [VoucherController::class, 'store'])->name('vouchers.store');
+    Route::put('/vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
+    Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
+    Route::patch('/admin/vouchers/{voucher}/toggle', [VoucherController::class, 'toggleStatus'])->name('vouchers.toggle');
+
 });

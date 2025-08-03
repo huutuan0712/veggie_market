@@ -13,7 +13,7 @@
                         {{ isset($product->id) ? 'Cập nhật thông tin sản phẩm' : 'Tạo sản phẩm mới cho cửa hàng' }}
                     </p>
                 </div>
-                <a href="{{ route('dashboard') }}" class="inline-flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
                     <x-heroicon-o-arrow-left class="h-5 w-5" />
                     <span>Quay lại Dashboard</span>
                 </a>

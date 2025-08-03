@@ -67,7 +67,7 @@ class ProductController extends Controller
         $dto = ProductDTO::fromRequest($request->validated());
         $this->productService->createDTO($dto);
 
-        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Tạo sản phẩm thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'products'])->with('success', 'Tạo sản phẩm thành công!');
     }
 
     /**
@@ -104,7 +104,7 @@ class ProductController extends Controller
         $dto = ProductDTO::fromRequest($request->validated());
         $this->productService->updateDTO($id, $dto);
 
-        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Cập nhật sản phẩm thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'products'])->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
     /**
@@ -113,7 +113,7 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         $this->productService->delete($id);
-        return redirect()->route('dashboard', ['tab' => 'products'])->with('success', 'Xóa sản phẩm thành công!');
+        return redirect()->route('admin.dashboard', ['tab' => 'products'])->with('success', 'Xóa sản phẩm thành công!');
     }
 
     public function destroyProductImage($id, $imageId)

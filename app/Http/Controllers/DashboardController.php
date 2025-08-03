@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Voucher;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -113,6 +114,19 @@ class DashboardController extends Controller
             ],
         ]);
 
+
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $type = $request->input('type', 'all');
+
+        $vouchers = Voucher::query()
+            ->when($search, fn($q) => $q->where('name', 'like', "%$search%")->orWhere('code', 'like', "%$search%"))
+            ->when($status !== 'all', fn($q) => $q->where('is_active', $status === 'active'))
+            ->when($status === 'expired', fn($q) => $q->where('expires_at', '<', now()))
+            ->when($type !== 'all', fn($q) => $q->where('type', $type))
+            ->latest()
+            ->get();
+
         return view('pages.admin.dashboard', compact(
             'stats',
             'recentOrders',
@@ -120,7 +134,9 @@ class DashboardController extends Controller
             'categoriesList',
             'products',
             'selectedCategory',
-            'orders'
+            'orders',
+            'vouchers',
+            'search', 'status', 'type'
         ));
     }
 
